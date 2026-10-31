@@ -16,6 +16,7 @@ The backend owns all OpenRouter communication and credentials. Existing job crea
 - `POST /api/ai/job-description` is available to recruiters and admins.
 - Accept a required job title and optional skills, minimum experience, employment type, work mode, location, and additional context.
 - Return an editable description draft only. Do not create, update, or publish a job.
+- Return the description as plain text without Markdown syntax.
 - The client saves the reviewed description through the existing job endpoint and marks the saved job `isAiGeneratedDescription: true`.
 - Generate content only from supplied facts. Do not invent company benefits, requirements, policies, or claims.
 

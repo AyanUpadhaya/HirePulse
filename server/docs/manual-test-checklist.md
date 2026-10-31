@@ -71,7 +71,7 @@ Use this checklist to verify the API manually in a local development environment
 - [ ] As an applicant, generate job recommendations and verify the results correspond to the applicant profile.
 - [ ] As a recruiter, generate candidate recommendations and verify the results correspond to recruiter-owned jobs.
 - [ ] Mark a recommendation viewed or dismissed; verify the update is visible to the recipient.
-- [ ] As a recruiter/admin, request an AI job-description draft; verify it returns editable text without creating or publishing a job.
+- [ ] As a recruiter/admin, request an AI job-description draft; verify it returns editable plain text without Markdown markers and does not create or publish a job.
 - [ ] Verify an applicant cannot request a job-description draft.
 - [ ] Save a reviewed AI draft through normal job creation/update and verify it is marked `isAiGeneratedDescription`.
 - [ ] As an applicant, request match insights without consent and with an unpublished/expired job; verify both are rejected.
