@@ -18,6 +18,7 @@ export const listUsers = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const target = req.resource;
   const isAdmin = req.user.role === ROLES.ADMIN;
+  const { currentPassword, ...updates } = req.body;
   if ((req.body.role !== undefined || req.body.status !== undefined) && !isAdmin) {
     throw new ApiError(403, "Only admins can change roles or account status");
   }
@@ -25,11 +26,18 @@ export const updateUser = asyncHandler(async (req, res) => {
     && (req.body.role !== undefined || req.body.status === "suspended" || req.body.status === "deleted")) {
     throw new ApiError(400, "You cannot change your own role or deactivate your account here");
   }
-  if (req.body.email && req.body.email !== target.email
-    && await User.exists({ email: req.body.email, _id: { $ne: target._id } })) {
-    throw new ApiError(409, "Email already in use");
+  if (updates.email && updates.email !== target.email) {
+    if (!isAdmin) {
+      const userWithPassword = await User.findById(target._id).select("+password");
+      if (!userWithPassword || !currentPassword || !(await userWithPassword.comparePassword(currentPassword))) {
+        throw new ApiError(401, "Current password is required to change your email");
+      }
+    }
+    if (await User.exists({ email: updates.email, _id: { $ne: target._id } })) {
+      throw new ApiError(409, "Email already in use");
+    }
   }
-  Object.assign(target, req.body);
+  Object.assign(target, updates);
   if (target.status !== "active") target.refreshTokens = [];
   await target.save();
   res.json({ success: true, data: target });

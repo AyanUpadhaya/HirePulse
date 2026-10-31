@@ -114,6 +114,9 @@ export function LoginPage() {
                 <label className="text-sm font-medium text-foreground" htmlFor="password">
                   Password
                 </label>
+                <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
               <Input
                 id="password"
@@ -146,4 +149,3 @@ export function LoginPage() {
     </div>
   );
 }
-

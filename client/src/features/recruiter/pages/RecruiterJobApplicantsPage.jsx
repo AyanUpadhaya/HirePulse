@@ -232,6 +232,13 @@ export function RecruiterJobApplicantsPage() {
 
                   {/* Right Column: Actions */}
                   <div className="flex flex-wrap items-center gap-2 lg:self-center shrink-0">
+                    {profile.isDiscoverable && applicant._id && (
+                      <Link to={`/applicants/${applicant._id}`}>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          Public Profile
+                        </Button>
+                      </Link>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -429,4 +436,3 @@ export function RecruiterJobApplicantsPage() {
     </div>
   );
 }
-

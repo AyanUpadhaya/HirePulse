@@ -168,6 +168,12 @@ export function RecruiterCandidatesPage() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
+                    <Link to={`/applicants/${applicant._id}`}>
+                      <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>View profile</span>
+                      </Button>
+                    </Link>
                     <Button
                       size="sm"
                       onClick={() => handleMessage(applicant._id, job._id)}
@@ -187,4 +193,3 @@ export function RecruiterCandidatesPage() {
     </div>
   );
 }
-

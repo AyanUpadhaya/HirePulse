@@ -18,6 +18,8 @@ export const authLimiter = make(15, 10, 'Too many attempts, please try again in 
   skipSuccessfulRequests: true,
 });
 
+export const passwordResetLimiter = make(60, 5, 'Too many password reset attempts. Please try again later.');
+
 // Silent token refresh happens often, so it gets its own, looser bucket
 export const refreshLimiter = make(15, 60, 'Too many refresh attempts.');
 

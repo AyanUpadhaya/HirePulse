@@ -118,8 +118,21 @@ export const updateRecruiterProfile = asyncHandler(async (req, res) => {
 
 export const getApplicantProfile = asyncHandler(async (req, res) => {
   const profile = await ApplicantProfile.findOne({ user: req.params.id, isDiscoverable: true })
-    .select("-emailJobRecommendations")
-    .populate("user", "name avatar");
-  if (!profile) throw new ApiError(404, "Applicant profile not found");
-  res.json({ success: true, data: profile });
+    .select("user headline summary location skills experience education")
+    .populate("user", "name avatar role status");
+  if (!profile || profile.user?.role !== ROLES.APPLICANT || profile.user.status !== "active") {
+    throw new ApiError(404, "Applicant profile not found");
+  }
+  res.json({
+    success: true,
+    data: {
+      user: { _id: profile.user._id, name: profile.user.name, avatar: profile.user.avatar },
+      headline: profile.headline,
+      summary: profile.summary,
+      location: profile.location,
+      skills: profile.skills,
+      experience: profile.experience,
+      education: profile.education,
+    },
+  });
 });

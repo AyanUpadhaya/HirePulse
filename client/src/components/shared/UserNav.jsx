@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/features/auth/authSlice";
 import { useLogoutMutation } from "@/features/auth/api";
 import { getInitials } from "@/lib/utils";
-import { LogOut, User, LayoutDashboard, Briefcase, Building, Shield, ChevronDown } from "lucide-react";
+import { LogOut, User, LayoutDashboard, Briefcase, Building, Shield, ChevronDown, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 
@@ -140,6 +140,14 @@ export function UserNav() {
           </div>
 
           <div className="border-t pt-1">
+            <Link
+              to="/settings"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted text-foreground transition-colors"
+            >
+              <Settings className="w-4 h-4 text-muted-foreground" />
+              <span>Account settings</span>
+            </Link>
             <button
               onClick={handleLogout}
               disabled={isLoading}
@@ -154,4 +162,3 @@ export function UserNav() {
     </div>
   );
 }
-

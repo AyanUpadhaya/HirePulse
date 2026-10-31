@@ -225,11 +225,17 @@ The `limit` is clamped server-side. Job listing defaults to 10 and maxes at 50; 
 |---|---|---|---|
 | `POST /auth/register` | Public | `{ "name": "Jane Doe", "email": "jane@example.com", "password": "Password123", "role": "applicant" }` | `{ user, accessToken }`; also sets refresh cookie. `role` may be `applicant` or `recruiter`, defaults to `applicant`. |
 | `POST /auth/login` | Public | `{ "email": "jane@example.com", "password": "Password123" }` | `{ user, accessToken }`; sets/rotates refresh cookie. |
+| `POST /auth/forgot-password` | Public | `{ "email": "jane@example.com" }` | Generic confirmation whether or not an account exists; emails a one-hour, one-time reset link when the email is registered. Rate limited. |
+| `POST /auth/reset-password` | Public | `{ "token": "token-from-email", "password": "NewPassword123" }` | Confirmation; consumes the reset token and revokes refresh sessions. |
 | `POST /auth/refresh` | Refresh cookie | No JSON body; include credentials | `{ user, accessToken }`; rotates refresh cookie. |
 | `POST /auth/logout` | Refresh cookie if present | No JSON body; include credentials | `null`; revokes only the current refresh session and clears cookie. |
 | `GET /auth/me` | Authenticated (access token) | None | `{ user }` |
+| `PATCH /auth/account` | Authenticated | Any non-empty subset of `{ "name": "Jane Doe", "email": "jane@example.com", "avatar": "https://..." }`; changing email also requires `currentPassword` | Updated `{ user }`; duplicate emails are rejected. |
+| `PATCH /auth/password` | Authenticated | `{ "currentPassword": "OldPassword123", "newPassword": "NewPassword123" }` | `null`; revokes all refresh sessions and clears the refresh cookie. |
 
 Password registration requirements: at least 8 characters, including one letter and one number. Email is normalized to lowercase. Admin accounts cannot self-register.
+
+Password reset email requires the existing SMTP environment variables and uses `FRONTEND_URL` to build the reset link. Reset tokens are stored hashed, expire after one hour, are rate limited, and can be consumed only once. The UI provides account settings for all authenticated roles; changing email requires the current password, and changing password ends other refresh sessions.
 
 User fields commonly returned: `_id`, `name`, `email`, `role`, `status`, `avatar`, `lastLoginAt`, `isProfileCompleted`, timestamps. Password and refresh token data are not returned.
 
@@ -327,7 +333,7 @@ Recruiter transitions are constrained: `submitted` → `reviewing`, `shortlisted
 | `PATCH /profiles/applicant` | Applicant | Partial applicant profile payload (example below) | Saved profile with `profileCompletion` |
 | `POST /profiles/applicant/resume` | Applicant | `multipart/form-data` with a `resume` PDF file (max 5 MB) | `{ "resume": "https://...", "profile": { ... } }`; uploads the resume to Cloudinary and stores the returned secure URL in the profile |
 | `PATCH /profiles/recruiter` | Recruiter | Partial `{ "jobTitle": "Talent Partner", "phone": "+...", "company": "ObjectId or null", "onboardingCompleted": true }` | Saved recruiter profile |
-| `GET /profiles/applicants/:id` | Recruiter/admin | Applicant user ObjectId | Public/discoverable applicant profile plus user name/avatar; non-discoverable/missing profile returns `404` |
+| `GET /profiles/applicants/:id` | Authenticated recruiter only | Applicant user ObjectId | Shareable discoverable profile with name/avatar, headline, summary, location, skills, experience, and education; excludes resume, email, and job preferences. Non-discoverable/missing profile returns `404`. |
 
 Applicant profile payload example:
 
@@ -366,6 +372,8 @@ Applicant profile payload example:
 ```
 
 Resume values are Cloudinary secure URL strings, not `FileAsset` references. Upload a PDF with `FormData` to `POST /profiles/applicant/resume` using the field name `resume`; do not set the multipart `Content-Type` header manually because the browser must add its boundary. Uploads are limited to one PDF file up to 5 MB. The endpoint updates the applicant's profile and returns the URL; send that URL in the profile `resume` field when editing profile data or optionally in an application payload. Configure Cloudinary server-side using `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`, with optional `CLOUDINARY_RESUME_FOLDER`. Until those credentials are set, uploads return `503`.
+
+Applicants can turn on recruiter sharing in the General profile tab and copy a recruiter-only profile link at `/applicants/:userId`. Recruiters must sign in to view it; disabling `isDiscoverable` immediately makes the shared page unavailable. Admins and anonymous visitors cannot view this page.
 
 `emailJobRecommendations` is an explicit applicant opt-in for scheduled job digest emails. It defaults to `false` for new and existing profiles. Include it in the applicant onboarding form and let applicants change it later in profile/email preferences. The server sends digests only when it is `true`; setting it to `false` stops future digests.
 
@@ -440,7 +448,7 @@ Notification types include `application_submitted`, `application_status_changed`
 | Method and path | Access | Payload / query | Response data |
 |---|---|---|---|
 | `GET /users` | Admin | `?page=1&limit=20`; optional `role=applicant\|recruiter\|admin`, `status=active\|suspended\|deleted` | Paginated user list |
-| `PATCH /users/:id` | User self or admin | Any subset of `{ "name": "Jane Doe", "email": "jane@example.com", "avatar": "https://...", "role": "recruiter", "status": "active" }` | Updated user |
+| `PATCH /users/:id` | User self or admin | Any subset of `{ "name": "Jane Doe", "email": "jane@example.com", "avatar": "https://...", "role": "recruiter", "status": "active" }`; changing your own email requires `currentPassword` | Updated user |
 | `DELETE /users/:id` | Self or admin | No body | `null`; deactivates/marks account deleted rather than physically removing it |
 
 Only admins can change `role` or `status`; users cannot change their own role or deactivate themselves through `PATCH`. The delete action for self marks the account deleted. Admins cannot change their own role through the update endpoint.

@@ -1,5 +1,5 @@
 import { baseApi } from "@/lib/baseApi";
-import { setCredentials, logout } from "./authSlice";
+import { setCredentials, logout, setUser } from "./authSlice";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -72,6 +72,46 @@ export const authApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.data?.user || response.data,
       providesTags: ["Auth"],
     }),
+    updateAccount: builder.mutation({
+      query: (account) => ({
+        url: "/auth/account",
+        method: "PATCH",
+        body: account,
+      }),
+      transformResponse: (response) => response.data.user,
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch {
+          // The caller displays the mutation error.
+        }
+      },
+      invalidatesTags: ["Auth"],
+    }),
+    changePassword: builder.mutation({
+      query: (passwords) => ({
+        url: "/auth/password",
+        method: "PATCH",
+        body: passwords,
+      }),
+    }),
+    requestPasswordReset: builder.mutation({
+      query: (email) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+      transformResponse: (response) => response.data,
+    }),
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: { token, password },
+      }),
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -81,5 +121,8 @@ export const {
   useRefreshMutation,
   useLogoutMutation,
   useGetMeQuery,
+  useUpdateAccountMutation,
+  useChangePasswordMutation,
+  useRequestPasswordResetMutation,
+  useResetPasswordMutation,
 } = authApi;
-

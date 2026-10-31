@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useGetMyProfileQuery, useUpdateApplicantProfileMutation, useUploadResumeMutation } from "../api";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,11 +25,15 @@ import {
   CheckCircle,
   ExternalLink,
   AlertCircle,
+  Copy,
+  Share2,
 } from "lucide-react";
 import { employmentTypes, workModes } from "@/features/jobs/schemas";
+import { selectCurrentUser } from "@/features/auth/authSlice";
 
 export function ApplicantProfilePage() {
   const { toast } = useToast();
+  const user = useSelector(selectCurrentUser);
   const { data: profile, isLoading, refetch } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isUpdating }] = useUpdateApplicantProfileMutation();
   const [uploadResume, { isLoading: isUploadingResume }] = useUploadResumeMutation();
@@ -87,6 +92,28 @@ export function ApplicantProfilePage() {
   const currentPrefTypes = watch("preferredEmploymentTypes") || [];
   const currentPrefModes = watch("preferredWorkModes") || [];
   const currentResumeUrl = watch("resume") || "";
+  const isDiscoverable = watch("isDiscoverable");
+  const publicProfileUrl = user?._id
+    ? `${window.location.origin}/applicants/${user._id}`
+    : "";
+
+  const copyPublicProfileLink = async () => {
+    if (!publicProfileUrl) return;
+    try {
+      await navigator.clipboard.writeText(publicProfileUrl);
+      toast({
+        title: "Profile link copied",
+        description: "Share this link with recruiters. They must sign in to view it.",
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title: "Could not copy link",
+        description: "Your browser blocked clipboard access. Copy the profile URL from the address field.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -393,12 +420,32 @@ export function ApplicantProfilePage() {
                       className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
                     />
                     <div>
-                      <div className="text-sm font-semibold">Make Profile Discoverable</div>
+                      <div className="text-sm font-semibold">Share my profile with recruiters</div>
                       <div className="text-xs text-muted-foreground">
-                        Allow hiring managers and recruiters to find your profile in candidate discovery searches.
+                        When enabled, recruiters can find your profile in candidate discovery and open your shareable profile page. Your resume, email, and job preferences are not shown.
                       </div>
                     </div>
                   </label>
+                  {isDiscoverable && (
+                    <div className="mt-3 flex flex-col gap-3 rounded-lg border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 text-sm font-semibold">
+                          <Share2 className="h-4 w-4 text-primary" />
+                          Recruiter profile link
+                        </div>
+                        <p className="mt-1 break-all text-xs text-muted-foreground">{publicProfileUrl}</p>
+                      </div>
+                      <Button type="button" variant="outline" size="sm" onClick={copyPublicProfileLink} className="shrink-0">
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy link
+                      </Button>
+                    </div>
+                  )}
+                  {!isDiscoverable && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Turn on sharing and save your profile to make the link available to recruiters.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -15,11 +15,14 @@ import { CompanyListPage } from "@/features/companies/pages/CompanyListPage";
 import { CompanyDetailsPage } from "@/features/companies/pages/CompanyDetailsPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
+import { ForgotPasswordPage } from "@/features/auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "@/features/auth/ResetPasswordPage";
 import { NotFoundPage } from "@/components/shared/NotFoundPage";
 
 // Applicant Pages
 import { ApplicantDashboardPage } from "@/features/dashboard/ApplicantDashboardPage";
 import { ApplicantProfilePage } from "@/features/profiles/pages/ApplicantProfilePage";
+import { RecruiterApplicantProfilePage } from "@/features/profiles/pages/RecruiterApplicantProfilePage";
 import { ApplicantApplicationsPage } from "@/features/applications/pages/ApplicantApplicationsPage";
 import { ApplicantRecommendationsPage } from "@/features/recommendations/pages/ApplicantRecommendationsPage";
 
@@ -40,6 +43,7 @@ import { AdminRecommendationsPage } from "@/features/admin/pages/AdminRecommenda
 // Shared Authenticated Pages
 import { MessagesPage } from "@/features/messaging/pages/MessagesPage";
 import { NotificationsPage } from "@/features/notifications/pages/NotificationsPage";
+import { SettingsPage } from "@/features/settings/pages/SettingsPage";
 
 export const router = createBrowserRouter([
   // Public Routes
@@ -54,6 +58,8 @@ export const router = createBrowserRouter([
       { path: "companies/:companyId", element: <CompanyDetailsPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
+      { path: "forgot-password", element: <ForgotPasswordPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
     ],
   },
 
@@ -96,6 +102,19 @@ export const router = createBrowserRouter([
     ],
   },
 
+  // Shareable applicant profiles are visible only to signed-in recruiters.
+  {
+    element: <ProtectedRoute allowedRoles={["recruiter"]} />,
+    children: [
+      {
+        element: <RoleLayoutWrapper />,
+        children: [
+          { path: "applicants/:applicantId", element: <RecruiterApplicantProfilePage /> },
+        ],
+      },
+    ],
+  },
+
   // Admin Routes
   {
     path: "/admin",
@@ -124,6 +143,7 @@ export const router = createBrowserRouter([
           { path: "messages", element: <MessagesPage /> },
           { path: "messages/:conversationId", element: <MessagesPage /> },
           { path: "notifications", element: <NotificationsPage /> },
+          { path: "settings", element: <SettingsPage /> },
         ],
       },
     ],
@@ -136,4 +156,3 @@ export const router = createBrowserRouter([
     children: [{ path: "*", element: <NotFoundPage /> }],
   },
 ]);
-

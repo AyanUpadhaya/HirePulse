@@ -20,6 +20,6 @@ router.get("/me", getMyProfile);
 router.post("/applicant/resume", authorize(ROLES.APPLICANT), uploadResumeFile, uploadApplicantResume);
 router.patch("/applicant", authorize(ROLES.APPLICANT), validate(applicantProfileSchema), updateApplicantProfile);
 router.patch("/recruiter", authorize(ROLES.RECRUITER), validate(recruiterProfileSchema), updateRecruiterProfile);
-router.get("/applicants/:id", authorize(ROLES.RECRUITER, ROLES.ADMIN), getApplicantProfile);
+router.get("/applicants/:id", authorize(ROLES.RECRUITER), getApplicantProfile);
 
 export default router;

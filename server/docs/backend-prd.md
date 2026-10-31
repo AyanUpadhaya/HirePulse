@@ -29,6 +29,21 @@ The backend owns all OpenRouter communication and credentials. Existing job crea
 - Send only selected profile fields (headline, summary, location, skills, experience title/description, education qualification/field) and job fields needed for comparison. Do not send the resume file, resume URL, account name, or email.
 - Do not persist prompts or generated results. Require a new explicit consent action for each request.
 
+### 2.3 Account settings and password recovery
+
+- Authenticated users can update their name, email, and avatar. Changing email requires the current password and rejects duplicate addresses.
+- Authenticated users can change their password by providing the current password; successful changes revoke refresh sessions.
+- Public forgot-password requests always return the same confirmation to avoid revealing whether an email is registered.
+- For a registered email, send a one-time reset link using configured SMTP. Store only a hash of the token, expire it after one hour, and rate-limit reset requests.
+- Resetting a password consumes the token atomically and revokes refresh sessions.
+
+### 2.4 Shareable applicant profile
+
+- Applicants can enable or disable recruiter visibility through the existing `isDiscoverable` profile setting and copy a link to their profile page.
+- Only authenticated recruiters can open a shared profile. Anonymous users, applicants, and admins cannot access the endpoint.
+- Return only the applicant's name/avatar and professional headline, summary, location, skills, experience, and education. Never include the applicant's email, resume URL, salary expectations, or private job preferences.
+- Disabling discoverability makes the shared profile unavailable and returns `404`.
+
 ## 3. API response and failure behavior
 
 Success responses use the standard `{ "success": true, "data": ... }` envelope. Errors use the standard error envelope.

@@ -39,6 +39,32 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().length(64),
+  password,
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: password,
+}).refine((value) => value.currentPassword !== value.newPassword, {
+  message: "New password must be different from the current password",
+  path: ["newPassword"],
+});
+
+export const accountUpdateSchema = z.object({
+  name: z.string().trim().min(2).max(50).optional(),
+  email: z.string().trim().toLowerCase().email().optional(),
+  avatar: z.string().trim().max(2000).url().nullable().optional(),
+  currentPassword: z.string().min(1).optional(),
+}).refine((value) => Object.keys(value).some((key) => key !== "currentPassword"), {
+  message: "Provide at least one account update",
+});
+
 export const jobSchema = z.object({
   company: objectId,
   category: objectId,
@@ -76,6 +102,7 @@ export const userUpdateSchema = z.object({
   name: z.string().trim().min(2).max(50).optional(),
   email: z.string().trim().toLowerCase().email().optional(),
   avatar: z.string().trim().max(2000).nullable().optional(),
+  currentPassword: z.string().min(1).optional(),
   role: z.enum(Object.values(ROLES)).optional(),
   status: z.enum(["active", "suspended", "deleted"]).optional(),
 });
