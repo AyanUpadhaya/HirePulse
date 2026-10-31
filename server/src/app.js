@@ -4,9 +4,11 @@ import express from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import morgan from "morgan";
+import { connectDB } from "./config/db.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import { apiLimiter } from "./middleware/rateLimiter.js";
+import { asyncHandler } from "./utils/asyncHandler.js";
 import applicationRoutes from "./routes/application.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -36,8 +38,12 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api", apiLimiter);
+app.use("/api", asyncHandler(async (_req, _res, next) => {
+  await connectDB();
+  next();
+}));
 app.get("/api/health", (_req, res) =>
-  res.json({ success: true, data: { status: "ok" } }),
+  res.json({ success: true, data: { status: "ok", database: "connected" } }),
 );
 
 app.use("/api/auth", authRoutes);

@@ -5,7 +5,7 @@ Use this checklist to verify the API manually in a local development environment
 ## Test setup
 
 - [ ] Start MongoDB and the server with the local development configuration.
-- [ ] Confirm `GET /api/health` returns `{ "success": true }`.
+- [ ] Confirm `GET /api/health` returns `{ "success": true }` and reports `data.database: "connected"`.
 - [ ] Seed a disposable development database with `npm run seed`.
 - [ ] Sign in with the locally configured admin account and the recruiter/applicant seed accounts. Keep credentials out of screenshots and test notes.
 - [ ] Keep an access token for each role available. Use a cookie-aware client for refresh-token flows.

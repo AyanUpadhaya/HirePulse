@@ -217,7 +217,7 @@ The `limit` is clamped server-side. Job listing defaults to 10 and maxes at 50; 
 
 | Method and path | Access | Payload / query | Response data |
 |---|---|---|---|
-| `GET {BASE}/health` | Public | None | `{ status: "ok" }` |
+| `GET {BASE}/health` | Public | None | `{ status: "ok", database: "connected" }`; the health route waits for MongoDB and returns an error if the database is unavailable |
 
 ### Authentication — `/auth`
 
