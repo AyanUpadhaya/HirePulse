@@ -1,83 +1,161 @@
-# MERN Auth + RBAC Template
+# HirePulse
 
-Reusable starter: **Vite + React (JS) + Redux Toolkit + RTK Query** on the front, **Express + Mongoose** on the back.
-Demo domain: a job board (clients post jobs, users apply, admins manage everything). Swap it for your own domain by copying the `Job` pattern.
+HirePulse is an AI-assisted recruitment marketplace MVP that helps applicants find opportunities and helps recruiters manage hiring in one place. Applicants can build a profile, apply to jobs, track application progress, and receive personalized job recommendations. Recruiters can publish jobs, review applicants, discover candidates, and communicate with applicants. Matching and AI features support users; they do not make hiring decisions.
 
-## Quick start
+## Screenshots
 
-```bash
-# 1. API
+Add screenshots to `docs/images/` and update these paths when they are ready.
+
+| Screen | Screenshot |
+| --- | --- |
+| Home and job discovery | ![HirePulse home and job discovery](docs/images/home-and-jobs.png) |
+| Applicant dashboard and profile | ![HirePulse applicant dashboard](docs/images/applicant-dashboard.png) |
+| Job posting and applicant review | ![HirePulse recruiter job and applicant review](docs/images/recruiter-applicants.png) |
+| Recommendations and messaging | ![HirePulse recommendations and messaging](docs/images/recommendations-and-messaging.png) |
+
+## Features
+
+### Applicants
+
+- Register and manage a professional profile, including skills, work experience, education, and resume.
+- Search published jobs, view job details, and apply with an optional cover letter.
+- Track application statuses and withdraw eligible applications.
+- Get profile-based job recommendations and opt in to recommendation emails.
+- View discoverable applicant profiles while signed in.
+- Message recruiters and manage notifications.
+- Request consent-based AI job-match insights.
+
+### Recruiters
+
+- Create and manage a company profile and job postings.
+- Generate editable job-description drafts with the optional AI assistant.
+- Review applications, cover letters, resumes, and hiring status.
+- Discover candidate recommendations and message applicants.
+- Manage notifications and account settings.
+
+### Administrators
+
+- Manage platform users and job categories.
+- Review jobs and access administrative recommendation views.
+
+### Platform
+
+- Role-based authentication and authorization for applicants, recruiters, and admins.
+- Explainable applicant/job matching, including salary-period-aware comparisons.
+- Optional scheduled recommendation emails for applicants who opt in.
+
+## Technology stack
+
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 18, Vite, React Router, Redux Toolkit, RTK Query, Tailwind CSS, React Hook Form, Zod |
+| Backend | Node.js (18+), Express 4, Mongoose 8, Zod |
+| Database | MongoDB |
+| Authentication | JWT access tokens and secure refresh-token cookies |
+| Optional integrations | OpenRouter for AI, Cloudinary for resume uploads, SMTP for recommendation emails |
+
+## Run locally
+
+### Prerequisites
+
+- Node.js 18 or later and npm.
+- MongoDB running locally, or a MongoDB Atlas connection string.
+- Git.
+
+### 1. Configure the backend
+
+In PowerShell:
+
+```powershell
 cd server
-cp .env.example .env        # set MONGO_URI + two long random JWT secrets
-npm install
-npm run seed                # optional: admin / client / user demo accounts + 2 jobs
-npm run dev                 # http://localhost:5000
+Copy-Item .env.example .env
+```
 
-# 2. Frontend (new terminal)
+Edit `server/.env` and set at least:
+
+```dotenv
+NODE_ENV=development
+PORT=5000
+MONGO_DEV_URI=mongodb://127.0.0.1:27017/hirepulse
+MONGO_PROD_URI=mongodb://127.0.0.1:27017/hirepulse
+JWT_ACCESS_SECRET=replace-with-a-long-random-secret
+JWT_REFRESH_SECRET=replace-with-a-different-long-random-secret
+CLIENT_URL=http://localhost:5173
+```
+
+The server requires both MongoDB URI variables even during local development. With `NODE_ENV=development`, it connects to `MONGO_DEV_URI`; other environment values select `MONGO_PROD_URI`. Do not point local development or the seed script at a production database.
+
+Install dependencies and start the API:
+
+```powershell
+npm install
+npm run dev
+```
+
+The API runs at `http://localhost:5000`. Check `http://localhost:5000/api/health` to verify the server and database connection.
+
+### 2. Configure and start the frontend
+
+In a second terminal:
+
+```powershell
 cd client
+Copy-Item .env.example .env
 npm install
-npm run dev                 # http://localhost:5173  (proxies /api -> :5000)
+npm run dev
 ```
 
-Seeded logins: `admin@example.com / Admin12345`, `client@example.com / Client12345`, `user@example.com / User12345`.
+The frontend runs at `http://localhost:5173`. Its `.env` should contain:
 
-## Auth design
-
-| Token | Lifetime | Where it lives |
-|---|---|---|
-| Access JWT | **20 min** (`ACCESS_TOKEN_EXPIRES`) | Redux memory only, sent as `Authorization: Bearer` |
-| Refresh JWT | 7 days (`REFRESH_TOKEN_DAYS`) | `httpOnly` cookie scoped to `/api/auth`, SHA-256 hash stored in DB |
-
-- When the API returns `401`, the RTK Query `baseQueryWithReauth` calls `POST /auth/refresh` once (shared across all concurrent requests), then retries the original request. If refresh fails the user is logged out.
-- On page load the app calls `/auth/refresh` to restore the session, so a reload does not log you out.
-- **Rotation + reuse detection:** each refresh issues a new refresh token and invalidates the old one. Presenting an old token revokes all of that user's sessions.
-- Up to 5 concurrent sessions (devices) per user. Logout revokes only the current one.
-- Known trade-off: two tabs refreshing at the *exact* same instant can trip reuse detection and log you out. Rare, and fails safe.
-
-## Roles and access control
-
-Roles: `user` (applicant), `client` (employer), `admin`. Public registration only allows `user` / `client`; admins come from the seed script or from another admin in the Admin Panel.
-
-| Action | Rule |
-|---|---|
-| Create job | client, admin |
-| Update / delete job | **owner or admin** |
-| Apply to job | user only (one application per job) |
-| View applicants / change status | job owner or admin |
-| Withdraw application | the applicant or admin |
-| Update / delete user | the user themself or admin (only admins change roles) |
-| List users | admin |
-
-Enforced on the server by `protect`, `authorize(...roles)` and `ownerOrAdmin(Model, ownerField)` (`server/src/middleware`). The frontend mirrors this for UX only: `ProtectedRoute roles=[...]`, `<RoleGate>`, role-filtered sidebar, `canModify(user, owner)`, and a separate dashboard per role (`/dashboard/user|client|admin`).
-
-## Security defaults
-
-helmet, CORS allow-list with credentials, body size limit, `express-mongo-sanitize`, zod validation that strips unknown fields (no mass assignment), bcrypt (cost 12), generic login errors, and rate limiting:
-
-- all `/api`: 300 req / 15 min
-- `/auth/login`, `/auth/register`: 10 / 15 min (successful logins not counted)
-- `/auth/refresh`: 60 / 15 min
-
-Behind a proxy (Render, Railway, Nginx) set `TRUST_PROXY=true` so limits apply per client IP.
-
-## API summary
-
+```dotenv
+VITE_API_BASE_URL=http://localhost:5000/api
 ```
-POST   /api/auth/register | login | refresh | logout      GET /api/auth/me
-GET    /api/jobs?q=&type=&location=&page=&limit=          GET /api/jobs/mine        GET /api/jobs/:id
-POST   /api/jobs   PATCH /api/jobs/:id   DELETE /api/jobs/:id
-POST   /api/jobs/:id/apply                GET /api/jobs/:id/applications
-GET    /api/applications/mine             PATCH /api/applications/:id/status   DELETE /api/applications/:id
-GET    /api/users  PATCH /api/users/:id   DELETE /api/users/:id
+
+On macOS/Linux, use `cp .env.example .env` instead of `Copy-Item`.
+
+### 3. Optional: seed local demo data
+
+With the backend configured to use a disposable local/test database, run:
+
+```powershell
+cd server
+npm run seed
 ```
-Responses are `{ success, data }` or `{ success: false, message }`; the RTK Query base query unwraps `data` for you.
 
-## Adding your own resource
+The seed script creates job categories, an admin, a recruiter, an applicant, and example jobs. The recruiter and applicant demo credentials are `client@example.com / Client12345` and `user@example.com / User12345`. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `server/.env` to choose the admin credentials. These are development-only credentials; never use them in production.
 
-1. Server: model in `models/`, zod schema in `validators/`, controller, then a route file using `protect`, `authorize`, `ownerOrAdmin(YourModel, 'owner')`; mount in `app.js`.
-2. Client: `services/yourApi.js` using `api.injectEndpoints` (add a tag in `api.js` `tagTypes`), import it in `app/store.js`, add a page and route.
+### Optional integrations
 
-## Deploying
+The app runs without these integrations, but their related features require configuration in `server/.env`:
 
-- Frontend (Netlify/Vercel): set `VITE_API_URL=https://your-api.com/api`, add an SPA redirect (`/* /index.html 200`).
-- API: set `CLIENT_URL` to the frontend origin. If frontend and API are on different *sites*, set `COOKIE_SAMESITE=none` (requires HTTPS). Same parent domain (`app.x.com` + `api.x.com`) works with `lax`.
+- **Resume uploads:** set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`.
+- **AI job descriptions and match insights:** set `OPENROUTER_API_KEY`. Keep this secret on the server; do not add it to a `VITE_` variable.
+- **Recommendation emails:** set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, and `EMAIL_FROM`. Configure `FRONTEND_URL`, `RECOMMENDATION_EMAIL_CRON`, and `APP_TIMEZONE` as needed.
+
+See `server/.env.example` for all backend settings.
+
+## Useful commands
+
+| Directory | Command | Description |
+| --- | --- | --- |
+| `server` | `npm run dev` | Start the API with Nodemon |
+| `server` | `npm start` | Start the API |
+| `server` | `npm run seed` | Seed the configured database with local demo data |
+| `client` | `npm run dev` | Start the Vite development server |
+| `client` | `npm run build` | Create a production frontend build |
+| `client` | `npm run lint` | Run ESLint |
+
+## Repository layout
+
+```text
+client/   React frontend
+server/   Express API, MongoDB models, jobs, and backend documentation
+PRD.md    Product requirements
+```
+
+## Notes
+
+- Use a separate database and credentials for local development; never run seed commands against production data.
+- AI output is a draft or informational match guidance and must be reviewed by users.
+- Recommendation emails are sent only to applicants who opt in.
+- Additional product and API details are documented in `server/docs/`.
