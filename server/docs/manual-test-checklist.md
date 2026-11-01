@@ -4,27 +4,27 @@ Use this checklist to verify the API manually in a local development environment
 
 ## Test setup
 
-- [ ] Start MongoDB and the server with the local development configuration.
-- [ ] Confirm `GET /api/health` returns `{ "success": true }` and reports `data.database: "connected"`.
-- [ ] Seed a disposable development database with `npm run seed`.
-- [ ] Sign in with the locally configured admin account and the recruiter/applicant seed accounts. Keep credentials out of screenshots and test notes.
-- [ ] Keep an access token for each role available. Use a cookie-aware client for refresh-token flows.
-- [ ] Verify `GET /api/jobs` returns published jobs. Use a returned job `_id` for detail and application tests; do not rely on IDs from earlier seed runs.
+- [*] Start MongoDB and the server with the local development configuration.
+- [*] Confirm `GET /api/health` returns `{ "success": true }` and reports `data.database: "connected"`.
+- [*] Seed a disposable development database with `npm run seed`.
+- [*] Sign in with the locally configured admin account and the recruiter/applicant seed accounts. Keep credentials out of screenshots and test notes.
+- [*] Keep an access token for each role available. Use a cookie-aware client for refresh-token flows.
+- [*] Verify `GET /api/jobs` returns published jobs. Use a returned job `_id` for detail and application tests; do not rely on IDs from earlier seed runs.
 
 ## Authentication and access control
 
 - [*] Register an applicant with valid details; verify the user and access token are returned.
-- [ ] Register a recruiter; verify the role is recruiter.
+- [*] Register a recruiter; verify the role is recruiter.
 - [*] Attempt to register an admin; verify self-registration is rejected.
 - [*] Log in with valid credentials and verify an access token is returned.
 - [*] Try a wrong password and malformed registration/login payloads; verify clear non-success responses.
-- [ ] Call `GET /api/auth/me` with and without a valid access token.
+- [*] Call `GET /api/auth/me` with and without a valid access token.
 - [*] Refresh a session and verify the refresh cookie rotates; log out and verify the session is revoked.
-- [ ] Update account name in settings; verify the user menu reflects the change.
-- [ ] Upload a valid JPEG, PNG, and WebP profile photo when Cloudinary is configured; verify the returned user and user menu show the new photo.
+- [*] Update account name in settings; verify the user menu reflects the change.
+- [*] Upload a valid JPEG, PNG, and WebP profile photo when Cloudinary is configured; verify the returned user and user menu show the new photo.
 - [ ] Try an unsupported, invalid-signature, and oversized profile photo; verify each upload is rejected and the existing photo remains unchanged.
-- [ ] Remove the profile photo and verify the user menu returns to its default avatar.
-- [ ] Verify the account email is disabled in settings and cannot be changed through `PATCH /auth/account` or a self-update to `PATCH /users/:id`.
+- [*] Remove the profile photo and verify the user menu returns to its default avatar.
+- [*] Verify the account email is disabled in settings and cannot be changed through `PATCH /auth/account` or a self-update to `PATCH /users/:id`.
 - [ ] Verify admins can still update another user's email through user management and duplicate emails are rejected.
 - [ ] Change password with the current password; verify all refresh sessions are revoked and the user is sent to sign in again.
 - [*] Request password reset for a registered and an unregistered email; verify the public confirmation is identical.
@@ -53,42 +53,42 @@ Use this checklist to verify the API manually in a local development environment
 - [*] Verify profile completion updates after profile changes.
 - [*] Upload a valid PDF resume when Cloudinary is configured; verify the returned URL is saved to the profile.
 - [ ] Try a non-PDF or oversized resume; verify the upload is rejected.
-- [ ] Apply to a published job with and without a cover letter/resume; verify the application is created.
+- [*] Apply to a published job with and without a cover letter/resume; verify the application is created.
 - [ ] Apply twice to the same job; verify duplicates are rejected.
-- [ ] View the applicant's application list and confirm job/company summaries and status.
-- [ ] Withdraw an eligible application and verify its status changes.
-- [ ] Try applying to a draft, closed, expired, or nonexistent job; verify the request is rejected.
+- [*] View the applicant's application list and confirm job/company summaries and status.
+- [*] Withdraw an eligible application and verify its status changes.
+- [*] Try applying to a draft, closed, expired, or nonexistent job; verify the request is rejected.
 
 ## Recruiter company and jobs
 
-- [ ] Load and update the recruiter's profile and company details.
-- [ ] Create a company and verify it is linked to the recruiter.
+- [*] Load and update the recruiter's profile and company details.
+- [*] Create a company and verify it is linked to the recruiter.
 - [ ] Create a draft job with required fields; verify it appears in the recruiter's job list but not public search.
-- [ ] Edit the draft, publish it, and verify it becomes visible to the public.
+- [*] Edit the draft, publish it, and verify it becomes visible to the public.
 - [ ] Verify job detail works for the owner on private jobs and hides those jobs from other roles.
-- [ ] Test job search filters, salary validation, invalid categories, and past deadlines for published jobs.
+- [*] Test job search filters, salary validation, invalid categories, and past deadlines for published jobs.
 - [ ] Verify a recruiter cannot create or edit jobs for a company they do not manage.
 - [ ] Open applicants for a job; verify applicant and discoverable profile details are available to the job owner.
-- [ ] Delete a job without applications; verify it is removed.
+- [*] Delete a job without applications; verify it is removed.
 - [ ] Delete a job with applications; verify it is archived rather than physically removed.
 
 ## Application review
 
-- [ ] As the job-owning recruiter, move an application through valid status transitions and add an internal note.
-- [ ] Try an invalid status transition and verify the update is rejected.
-- [ ] Verify another recruiter cannot view or update applications for a job they do not own.
-- [ ] Verify terminal application statuses cannot be advanced further and only eligible applications can be withdrawn.
+- [*] As the job-owning recruiter, move an application through valid status transitions and add an internal note.
+- [*] Try an invalid status transition and verify the update is rejected.
+- [*] Verify another recruiter cannot view or update applications for a job they do not own.
+- [*] Verify terminal application statuses cannot be advanced further and only eligible applications can be withdrawn.
 
 ## Recommendations and AI
 
-- [ ] As an applicant, generate job recommendations and verify the results correspond to the applicant profile.
-- [ ] As a recruiter, generate candidate recommendations and verify the results correspond to recruiter-owned jobs.
+- [*] As an applicant, generate job recommendations and verify the results correspond to the applicant profile.
+- [*] As a recruiter, generate candidate recommendations and verify the results correspond to recruiter-owned jobs.
 - [ ] Mark a recommendation viewed or dismissed; verify the update is visible to the recipient.
-- [ ] As a recruiter/admin, request an AI job-description draft; verify it returns editable plain text without Markdown markers and does not create or publish a job.
+- [*] As a recruiter/admin, request an AI job-description draft; verify it returns editable plain text without Markdown markers and does not create or publish a job.
 - [ ] Verify an applicant cannot request a job-description draft.
-- [ ] Save a reviewed AI draft through normal job creation/update and verify it is marked `isAiGeneratedDescription`.
+- [*] Save a reviewed AI draft through normal job creation/update and verify it is marked `isAiGeneratedDescription`.
 - [ ] As an applicant, request match insights without consent and with an unpublished/expired job; verify both are rejected.
-- [ ] Request insights for a published job with consent and a populated profile; verify the response has a summary, matching skills, gaps, suggestions, and disclaimer, but no score or hiring recommendation.
+- [*] Request insights for a published job with consent and a populated profile; verify the response has a summary, matching skills, gaps, suggestions, and disclaimer, but no score or hiring recommendation.
 - [ ] Verify AI endpoints return clear errors when provider configuration is absent or the provider fails, without exposing credentials/provider response bodies.
 - [ ] Verify AI requests are rate limited and that normal non-AI features still work when AI is unavailable.
 
@@ -113,11 +113,11 @@ Use this checklist to verify the API manually in a local development environment
 
 ## Optional integrations and regression
 
-- [ ] When SMTP is configured, verify an opted-in applicant can receive a recommendation digest and an opted-out applicant does not.
+- [*] When SMTP is configured, verify an opted-in applicant can receive a recommendation digest and an opted-out applicant does not.
 - [ ] When SMTP is not configured, verify the API starts and the rest of the application remains usable.
 - [ ] When Cloudinary is not configured, verify resume uploads fail clearly without preventing other profile updates.
 - [ ] When Cloudinary is not configured, verify profile photo uploads fail clearly without preventing account name or email updates.
-- [ ] Confirm responses use the standard success/error envelope and do not expose passwords, refresh tokens, or provider secrets.
+- [*] Confirm responses use the standard success/error envelope and do not expose passwords, refresh tokens, or provider secrets.
 - [ ] Repeat key flows after reseeding and confirm tests use the newly returned IDs rather than stale database IDs.
 
 ## Findings
