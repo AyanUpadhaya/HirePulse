@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle, Briefcase, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useResetPasswordMutation } from "./api";
 
 export function ResetPasswordPage() {
@@ -71,11 +71,11 @@ export function ResetPasswordPage() {
               )}
               <div className="space-y-1.5">
                 <label htmlFor="new-password" className="text-sm font-medium">New password</label>
-                <Input id="new-password" type="password" autoComplete="new-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
+                <PasswordInput id="new-password" autoComplete="new-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="confirm-password" className="text-sm font-medium">Confirm new password</label>
-                <Input id="confirm-password" type="password" autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+                <PasswordInput id="confirm-password" autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
               </div>
               <p className="text-xs text-muted-foreground">At least 8 characters, including one letter and one number.</p>
               <Button type="submit" className="w-full" isLoading={isLoading}>Reset password</Button>

@@ -6,6 +6,7 @@ import { registerSchema } from "./schemas";
 import { useRegisterMutation } from "./api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/Card";
 import { Briefcase, AlertCircle, User, Building } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
@@ -181,9 +182,8 @@ export function RegisterPage() {
               <label className="text-sm font-medium text-foreground" htmlFor="password">
                 Password
               </label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
                 error={Boolean(errors.password)}
@@ -215,4 +215,3 @@ export function RegisterPage() {
     </div>
   );
 }
-

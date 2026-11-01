@@ -5,6 +5,7 @@ import { KeyRound, UserRound, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/components/ui/Toast";
 import { logout, selectCurrentUser } from "@/features/auth/authSlice";
 import { useChangePasswordMutation, useUpdateAccountMutation } from "@/features/auth/api";
@@ -126,7 +127,7 @@ export function SettingsPage() {
             {account.email.trim().toLowerCase() !== user?.email && (
               <div className="space-y-1.5">
                 <label htmlFor="email-current-password" className="text-sm font-medium">Current password (required to change email)</label>
-                <Input id="email-current-password" type="password" autoComplete="current-password" value={account.currentPassword} onChange={(event) => setAccount({ ...account, currentPassword: event.target.value })} />
+                <PasswordInput id="email-current-password" autoComplete="current-password" value={account.currentPassword} onChange={(event) => setAccount({ ...account, currentPassword: event.target.value })} />
               </div>
             )}
             {accountState.error?.data?.message && !accountError && (
@@ -152,16 +153,16 @@ export function SettingsPage() {
             {passwordError && <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive" role="alert">{passwordError}</p>}
             <div className="space-y-1.5">
               <label htmlFor="current-password" className="text-sm font-medium">Current password</label>
-              <Input id="current-password" type="password" autoComplete="current-password" required value={passwords.currentPassword} onChange={(event) => setPasswords({ ...passwords, currentPassword: event.target.value })} />
+              <PasswordInput id="current-password" autoComplete="current-password" required value={passwords.currentPassword} onChange={(event) => setPasswords({ ...passwords, currentPassword: event.target.value })} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="new-password" className="text-sm font-medium">New password</label>
-                <Input id="new-password" type="password" autoComplete="new-password" minLength={8} required value={passwords.newPassword} onChange={(event) => setPasswords({ ...passwords, newPassword: event.target.value })} />
+                <PasswordInput id="new-password" autoComplete="new-password" minLength={8} required value={passwords.newPassword} onChange={(event) => setPasswords({ ...passwords, newPassword: event.target.value })} />
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="confirm-new-password" className="text-sm font-medium">Confirm new password</label>
-                <Input id="confirm-new-password" type="password" autoComplete="new-password" required value={passwords.confirmPassword} onChange={(event) => setPasswords({ ...passwords, confirmPassword: event.target.value })} />
+                <PasswordInput id="confirm-new-password" autoComplete="new-password" required value={passwords.confirmPassword} onChange={(event) => setPasswords({ ...passwords, confirmPassword: event.target.value })} />
               </div>
             </div>
             <p className="text-xs text-muted-foreground">Use at least 8 characters, including one letter and one number.</p>

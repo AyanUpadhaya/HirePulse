@@ -6,6 +6,7 @@ import { loginSchema } from "./schemas";
 import { useLoginMutation } from "./api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/Card";
 import { Briefcase, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
@@ -118,9 +119,8 @@ export function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 autoComplete="current-password"
                 error={Boolean(errors.password)}
