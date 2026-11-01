@@ -4,14 +4,15 @@ HirePulse is an AI-assisted recruitment marketplace MVP that helps applicants fi
 
 ## Screenshots
 
-Add screenshots to `docs/images/` and update these paths when they are ready.
+
 
 | Screen | Screenshot |
 | --- | --- |
 | Home and job discovery | ![HirePulse home and job discovery](docs/images/home-and-jobs.png) |
 | Applicant dashboard and profile | ![HirePulse applicant dashboard](docs/images/applicant-dashboard.png) |
 | Job posting and applicant review | ![HirePulse recruiter job and applicant review](docs/images/recruiter-applicants.png) |
-| Recommendations and messaging | ![HirePulse recommendations and messaging](docs/images/recommendations-and-messaging.png) |
+| Messaging | ![HirePulse recommendations and messaging](docs/images/recommendations-and-messaging.png) |
+| Email Recommendations | ![HirePulse email recommendations for jobs](docs/images/email-recommendations.png) |
 
 ## Features
 
@@ -77,10 +78,52 @@ Edit `server/.env` and set at least:
 NODE_ENV=development
 PORT=5000
 MONGO_DEV_URI=mongodb://127.0.0.1:27017/hirepulse
-MONGO_PROD_URI=mongodb://127.0.0.1:27017/hirepulse
-JWT_ACCESS_SECRET=replace-with-a-long-random-secret
-JWT_REFRESH_SECRET=replace-with-a-different-long-random-secret
+MONGO_PROD_URI=
+
+# Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+JWT_ACCESS_SECRET=change_me_access
+JWT_REFRESH_SECRET=change_me_refresh
+
+ACCESS_TOKEN_EXPIRES=20m
+REFRESH_TOKEN_DAYS=7
+
+# Comma-separated list of allowed frontend origins
 CLIENT_URL=http://localhost:5173
+
+# Cloudinary resume uploads
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_RESUME_FOLDER=
+
+# SMTP email for scheduled job recommendation digests
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASSWORD=
+EMAIL_FROM=http://localhost:5173
+FRONTEND_URL=
+RECOMMENDATION_EMAIL_CRON=0 0 * * *
+APP_TIMEZONE=Asia/Dhaka
+RECOMMENDATION_EMAIL_MAX_JOBS=5
+RECOMMENDATION_EMAIL_MIN_SCORE=40
+
+# OpenRouter AI features (keep the API key server-side)
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=openai/gpt-4o-mini
+OPENROUTER_API_URL=https://openrouter.ai/api/v1/chat/completions
+OPENROUTER_TIMEOUT_MS=30000
+
+# Use "none" only when frontend and API are on different sites (requires HTTPS)
+COOKIE_SAMESITE=lax
+# Set true when running behind a proxy (Render, Railway, Nginx...)
+TRUST_PROXY=false
+
+# Used by `npm run seed`
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=Admin12345
+
 ```
 
 The server requires both MongoDB URI variables even during local development. With `NODE_ENV=development`, it connects to `MONGO_DEV_URI`; other environment values select `MONGO_PROD_URI`. Do not point local development or the seed script at a production database.
