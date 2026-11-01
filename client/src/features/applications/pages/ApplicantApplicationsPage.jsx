@@ -12,10 +12,6 @@ import {
   FileText,
   Building2,
   Calendar,
-  Clock,
-  AlertCircle,
-  ExternalLink,
-  ChevronRight,
   Ban,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -26,6 +22,7 @@ export function ApplicantApplicationsPage() {
   const [withdrawApp, { isLoading: isWithdrawing }] = useWithdrawApplicationMutation();
 
   const [withdrawTarget, setWithdrawTarget] = useState(null);
+  const [expandedCoverLetters, setExpandedCoverLetters] = useState({});
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -141,9 +138,32 @@ export function ApplicantApplicationsPage() {
                     </div>
 
                     {app.coverLetter && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 mt-2 bg-muted/40 p-2.5 rounded-lg border">
-                        <strong className="text-foreground">Cover letter:</strong> {app.coverLetter}
-                      </p>
+                      <div className="mt-2">
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          className="h-auto justify-start p-0 text-xs"
+                          aria-expanded={Boolean(expandedCoverLetters[app._id])}
+                          aria-controls={`cover-letter-${app._id}`}
+                          onClick={() =>
+                            setExpandedCoverLetters((current) => ({
+                              ...current,
+                              [app._id]: !current[app._id],
+                            }))
+                          }
+                        >
+                          {expandedCoverLetters[app._id] ? "Hide cover letter" : "Show cover letter"}
+                        </Button>
+                        {expandedCoverLetters[app._id] && (
+                          <p
+                            id={`cover-letter-${app._id}`}
+                            className="mt-2 whitespace-pre-wrap rounded-lg border bg-muted/40 p-2.5 text-xs text-muted-foreground"
+                          >
+                            {app.coverLetter}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -189,4 +209,3 @@ export function ApplicantApplicationsPage() {
     </div>
   );
 }
-

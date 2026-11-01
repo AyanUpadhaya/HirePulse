@@ -13,41 +13,41 @@ Use this checklist to verify the API manually in a local development environment
 
 ## Authentication and access control
 
-- [ ] Register an applicant with valid details; verify the user and access token are returned.
+- [*] Register an applicant with valid details; verify the user and access token are returned.
 - [ ] Register a recruiter; verify the role is recruiter.
-- [ ] Attempt to register an admin; verify self-registration is rejected.
-- [ ] Log in with valid credentials and verify an access token is returned.
-- [ ] Try a wrong password and malformed registration/login payloads; verify clear non-success responses.
+- [*] Attempt to register an admin; verify self-registration is rejected.
+- [*] Log in with valid credentials and verify an access token is returned.
+- [*] Try a wrong password and malformed registration/login payloads; verify clear non-success responses.
 - [ ] Call `GET /api/auth/me` with and without a valid access token.
-- [ ] Refresh a session and verify the refresh cookie rotates; log out and verify the session is revoked.
-- [ ] Update account name and avatar in settings; verify the user menu reflects the changes.
+- [*] Refresh a session and verify the refresh cookie rotates; log out and verify the session is revoked.
+- [*] Update account name and avatar in settings; verify the user menu reflects the changes.
 - [ ] Change the account email with the correct current password; verify duplicate emails and missing/incorrect passwords are rejected.
 - [ ] Change password with the current password; verify all refresh sessions are revoked and the user is sent to sign in again.
-- [ ] Request password reset for a registered and an unregistered email; verify the public confirmation is identical.
-- [ ] With SMTP configured, use the emailed reset link before and after its expiry; verify the valid token works once and expired/reused tokens fail.
-- [ ] Verify a successful password reset invalidates existing refresh sessions.
+- [*] Request password reset for a registered and an unregistered email; verify the public confirmation is identical.
+- [*] With SMTP configured, use the emailed reset link before and after its expiry; verify the valid token works once and expired/reused tokens fail.
+- [*] Verify a successful password reset invalidates existing refresh sessions.
 - [ ] Try a protected route without a token and a role-restricted route with the wrong role; verify `401`/`403` behavior.
 
 ## Public marketplace
 
-- [ ] Load the job list anonymously; verify only published, non-expired jobs appear.
-- [ ] Search and filter jobs by text, category, company, location, employment type, and work mode.
+- [*] Load the job list anonymously; verify only published, non-expired jobs appear.
+- [*] Search and filter jobs by text, category, company, location, employment type, and work mode.
 - [ ] Move between pages and verify the returned items and pagination totals are consistent.
-- [ ] Open a published job by its current ID; verify the job, company, and category details are returned.
-- [ ] Request a nonexistent or malformed job ID; verify the expected not-found or validation response.
-- [ ] Load the company directory and a company detail page; verify company details and its published jobs.
-- [ ] Load active job categories and verify category details.
-- [ ] Verify draft, paused, closed, and archived jobs are not exposed to anonymous users.
+- [*] Open a published job by its current ID; verify the job, company, and category details are returned.
+- [*] Request a nonexistent or malformed job ID; verify the expected not-found or validation response.
+- [*] Load the company directory and a company detail page; verify company details and its published jobs.
+- [*] Load active job categories and verify category details.
+- [*] Verify draft, paused, closed, and archived jobs are not exposed to anonymous users.
 
 ## Applicant profile and applications
 
-- [ ] Load the applicant's own profile before and after saving profile details.
-- [ ] Update headline, summary, location, skills, experience, education, preferences, and email-recommendation opt-in.
-- [ ] Enable recruiter profile sharing, save, copy the link, and verify a recruiter can open it while signed in.
-- [ ] Verify the shared profile hides email, resume URL, salary expectations, and job preferences.
-- [ ] Disable recruiter profile sharing and verify the link returns `404`; verify applicants, anonymous visitors, and admins cannot access the page/API.
-- [ ] Verify profile completion updates after profile changes.
-- [ ] Upload a valid PDF resume when Cloudinary is configured; verify the returned URL is saved to the profile.
+- [*] Load the applicant's own profile before and after saving profile details.
+- [*] Update headline, summary, location, skills, experience, education, preferences, and email-recommendation opt-in.
+- [*] Enable recruiter profile sharing, save, copy the link, and verify a recruiter can open it while signed in.
+- [*] Verify the shared profile hides email, resume URL, salary expectations, and job preferences.
+- [*] Disable recruiter profile sharing and verify the link returns `404`; verify applicants, anonymous visitors, and admins cannot access the page/API.
+- [*] Verify profile completion updates after profile changes.
+- [*] Upload a valid PDF resume when Cloudinary is configured; verify the returned URL is saved to the profile.
 - [ ] Try a non-PDF or oversized resume; verify the upload is rejected.
 - [ ] Apply to a published job with and without a cover letter/resume; verify the application is created.
 - [ ] Apply twice to the same job; verify duplicates are rejected.
