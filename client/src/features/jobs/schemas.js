@@ -14,6 +14,12 @@ export const workModes = [
   { value: "hybrid", label: "Hybrid" },
 ];
 
+export const salaryPeriods = [
+  { value: "monthly", label: "Monthly" },
+  { value: "yearly", label: "Yearly" },
+  { value: "hourly", label: "Hourly" },
+];
+
 export const jobStatuses = [
   { value: "draft", label: "Draft" },
   { value: "published", label: "Published" },
@@ -44,6 +50,7 @@ export const jobSchema = z
     minExperienceYears: z.coerce.number().min(0, "Years cannot be negative").default(0),
     salaryMin: z.coerce.number().min(0, "Salary cannot be negative").optional(),
     salaryMax: z.coerce.number().min(0, "Salary cannot be negative").optional(),
+    salaryPeriod: z.enum(["monthly", "yearly", "hourly"]).default("monthly"),
     currency: z.string().trim().default("USD"),
     applicationDeadline: z.string().optional().nullable(),
     vacancies: z.coerce.number().min(1, "Vacancies must be at least 1").default(1),
@@ -67,4 +74,3 @@ export const applyJobSchema = z.object({
   coverLetter: z.string().trim().max(3000, "Cover letter too long").optional(),
   resume: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
-

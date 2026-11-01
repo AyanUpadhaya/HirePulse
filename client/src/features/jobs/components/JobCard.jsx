@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { MapPin, Briefcase, DollarSign, Calendar, Building2 } from "lucide-react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatSalaryRange, formatDate } from "@/lib/utils";
 
 export function JobCard({ job }) {
   if (!job) return null;
@@ -77,11 +77,7 @@ export function JobCard({ job }) {
             <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
               <DollarSign className="w-3.5 h-3.5" />
               <span>
-                {job.salaryMin && job.salaryMax
-                  ? `${formatCurrency(job.salaryMin, job.currency)} - ${formatCurrency(job.salaryMax, job.currency)}`
-                  : job.salaryMin
-                  ? `From ${formatCurrency(job.salaryMin, job.currency)}`
-                  : `Up to ${formatCurrency(job.salaryMax, job.currency)}`}
+                {formatSalaryRange(job)}
               </span>
             </div>
           )}
@@ -127,4 +123,3 @@ export function JobCard({ job }) {
     </Card>
   );
 }
-

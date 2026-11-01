@@ -25,7 +25,7 @@ import {
   Share2,
   CheckCircle,
 } from "lucide-react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatSalaryRange, formatDate } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 
 export function JobDetailsPage() {
@@ -271,13 +271,7 @@ export function JobDetailsPage() {
           <div>
             <span className="text-xs text-muted-foreground block">Offered Salary</span>
             <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-              {job.salaryMin && job.salaryMax
-                ? `${formatCurrency(job.salaryMin, job.currency)} - ${formatCurrency(job.salaryMax, job.currency)}`
-                : job.salaryMin
-                ? `From ${formatCurrency(job.salaryMin, job.currency)}`
-                : job.salaryMax
-                ? `Up to ${formatCurrency(job.salaryMax, job.currency)}`
-                : "Not disclosed"}
+              {formatSalaryRange(job)}
             </span>
           </div>
         </div>
@@ -415,4 +409,3 @@ export function JobDetailsPage() {
     </div>
   );
 }
-

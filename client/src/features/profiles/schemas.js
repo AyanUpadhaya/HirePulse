@@ -31,6 +31,7 @@ export const applicantProfileSchema = z.object({
   preferredWorkModes: z.array(z.string()).default([]),
   expectedSalaryMin: z.coerce.number().min(0).optional(),
   expectedSalaryMax: z.coerce.number().min(0).optional(),
+  expectedSalaryPeriod: z.enum(["monthly", "yearly", "hourly"]).optional(),
   currency: z.string().default("USD"),
   isDiscoverable: z.boolean().default(true),
   emailJobRecommendations: z.boolean().default(false),
@@ -42,4 +43,3 @@ export const recruiterProfileSchema = z.object({
   company: z.string().nullable().optional(),
   onboardingCompleted: z.boolean().default(false),
 });
-

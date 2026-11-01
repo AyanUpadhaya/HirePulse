@@ -1,5 +1,6 @@
 export const EMPLOYMENT_TYPES = ["full_time", "part_time", "contract", "internship", "freelance"];
 export const WORK_MODES = ["onsite", "remote", "hybrid"];
+export const SALARY_PERIODS = ["monthly", "yearly", "hourly"];
 export const JOB_STATUSES = ["draft", "published", "paused", "closed", "archived"];
 
 //updaated job model
@@ -42,6 +43,7 @@ const jobSchema = new mongoose.Schema(
     location: { type: String, trim: true },
     salaryMin: { type: Number, min: 0 },
     salaryMax: { type: Number, min: 0 },
+    salaryPeriod: { type: String, enum: SALARY_PERIODS, default: "monthly" },
     currency: { type: String, trim: true, uppercase: true, default: "USD" },
     applicationDeadline: { type: Date, index: true },
     vacancies: { type: Number, min: 1, default: 1 },

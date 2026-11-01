@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { SALARY_PERIODS } from "./Job.js";
 
 const experienceSchema = new mongoose.Schema(
   {
@@ -48,6 +49,7 @@ const applicantProfileSchema = new mongoose.Schema(
     preferredWorkModes: [{ type: String, enum: ["onsite", "remote", "hybrid"] }],
     expectedSalaryMin: { type: Number, min: 0 },
     expectedSalaryMax: { type: Number, min: 0 },
+    expectedSalaryPeriod: { type: String, enum: SALARY_PERIODS, default: "monthly" },
     currency: { type: String, trim: true, uppercase: true, default: "USD" },
     isDiscoverable: { type: Boolean, default: true, index: true },
     emailJobRecommendations: { type: Boolean, default: false, index: true },

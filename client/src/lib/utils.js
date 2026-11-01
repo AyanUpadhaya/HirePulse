@@ -42,6 +42,14 @@ export function formatCurrency(amount, currency = "USD") {
   }
 }
 
+export function formatSalaryRange({ salaryMin, salaryMax, currency = "USD", salaryPeriod = "monthly" }) {
+  if (salaryMin == null && salaryMax == null) return "Not disclosed";
+  const min = salaryMin == null ? null : formatCurrency(salaryMin, currency);
+  const max = salaryMax == null ? null : formatCurrency(salaryMax, currency);
+  const range = min && max ? `${min} - ${max}` : min ? `From ${min}` : `Up to ${max}`;
+  return `${range} / ${salaryPeriod}`;
+}
+
 export function getInitials(name) {
   if (!name) return "?";
   return name
@@ -52,4 +60,3 @@ export function getInitials(name) {
     .join("")
     .toUpperCase();
 }
-

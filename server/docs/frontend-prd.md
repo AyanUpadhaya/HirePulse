@@ -261,7 +261,7 @@ Job status values: `draft`, `published`, `paused`, `closed`, `archived`.
 |---|---|---|---|
 | `GET /jobs` | Public; optional access token | Query: `page`, `limit`, `q`, `category` (category ID or slug), `company` (ID), `location`, `employmentType`, `workMode`; admin may additionally use a job `status` | Paginated `{ items, total, page, pages }`; items populate company and category summaries. Public/applicant/recruiter results are published jobs with unexpired/no deadline. Admin can select a status such as `draft` or `closed`; `status=all` currently returns the same published-job view, so do not use `all` to request every status. |
 | `GET /jobs/mine` | Recruiter/admin | None | Array of owned jobs, each with `applicationsCount`, populated company and category |
-| `POST /jobs` | Recruiter/admin | Required fields: `company`, `category`, `title`, `description`, `employmentType`, `workMode`. Optional fields in create schema: `requiredSkills`, `minExperienceYears`, `location`, `salaryMin`, `salaryMax`, `currency`, `applicationDeadline`, `vacancies`, `status`, `isAiGeneratedDescription`. | Created job |
+| `POST /jobs` | Recruiter/admin | Required fields: `company`, `category`, `title`, `description`, `employmentType`, `workMode`. Optional fields in create schema: `requiredSkills`, `minExperienceYears`, `location`, `salaryMin`, `salaryMax`, `salaryPeriod` (`monthly`, `yearly`, or `hourly`; defaults to `monthly`), `currency`, `applicationDeadline`, `vacancies`, `status`, `isAiGeneratedDescription`. | Created job |
 | `GET /jobs/:id` | Public; optional access token | ObjectId path | Job with detailed company/category. Draft/non-public jobs are visible only to owner or admin. |
 | `PATCH /jobs/:id` | Job owner/admin | Any subset of job create fields. Do not send `publishedAt` or `closedAt`. | Updated job |
 | `DELETE /jobs/:id` | Job owner/admin | No body | `null` if it had no applications; otherwise archives it and returns the archived job. |
@@ -284,6 +284,7 @@ Job create payload example:
   "location": "Dhaka",
   "salaryMin": 50000,
   "salaryMax": 80000,
+  "salaryPeriod": "monthly",
   "currency": "USD",
   "applicationDeadline": "2026-12-31T23:59:59.000Z",
   "vacancies": 1,
@@ -365,11 +366,14 @@ Applicant profile payload example:
   "preferredWorkModes": ["remote", "hybrid"],
   "expectedSalaryMin": 50000,
   "expectedSalaryMax": 90000,
+  "expectedSalaryPeriod": "monthly",
   "currency": "USD",
   "isDiscoverable": true,
   "emailJobRecommendations": false
 }
 ```
+
+Expected salary periods are `monthly`, `yearly`, or `hourly` (default `monthly`). Recommendation matching annualizes salary ranges for comparison (`monthly × 12`, `yearly × 1`, `hourly × 2,080`); the hourly factor is an estimate. Salary is treated as neutral when either side has no salary range or their currencies differ.
 
 Resume values are Cloudinary secure URL strings, not `FileAsset` references. Upload a PDF with `FormData` to `POST /profiles/applicant/resume` using the field name `resume`; do not set the multipart `Content-Type` header manually because the browser must add its boundary. Uploads are limited to one PDF file up to 5 MB. The endpoint updates the applicant's profile and returns the URL; send that URL in the profile `resume` field when editing profile data or optionally in an application payload. Configure Cloudinary server-side using `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`, with optional `CLOUDINARY_RESUME_FOLDER`. Until those credentials are set, uploads return `503`.
 

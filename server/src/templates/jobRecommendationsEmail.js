@@ -9,10 +9,11 @@ const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character
 const formatSalary = (job) => {
   if (job.salaryMin == null && job.salaryMax == null) return "Salary not listed";
   const currency = job.currency || "USD";
+  const period = job.salaryPeriod || "monthly";
   const min = job.salaryMin == null ? null : `${currency} ${job.salaryMin.toLocaleString("en-US")}`;
   const max = job.salaryMax == null ? null : `${currency} ${job.salaryMax.toLocaleString("en-US")}`;
-  if (min && max) return `${min} - ${max}`;
-  return min || `Up to ${max}`;
+  const amount = min && max ? `${min} - ${max}` : min || `Up to ${max}`;
+  return `${amount} / ${period}`;
 };
 
 export const buildJobRecommendationsEmail = ({ applicantName, jobs, frontendUrl }) => {

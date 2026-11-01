@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { APPLICATION_STATUSES } from "../models/Application.js";
-import { EMPLOYMENT_TYPES, JOB_STATUSES, WORK_MODES } from "../models/Job.js";
+import { EMPLOYMENT_TYPES, JOB_STATUSES, SALARY_PERIODS, WORK_MODES } from "../models/Job.js";
 import { ROLES } from "../models/User.js";
 
 const objectId = z.string().regex(/^[a-f\d]{24}$/i, "Invalid id");
@@ -77,6 +77,7 @@ export const jobSchema = z.object({
   location: z.string().trim().max(160).optional(),
   salaryMin: z.number().min(0).optional(),
   salaryMax: z.number().min(0).optional(),
+  salaryPeriod: z.enum(SALARY_PERIODS).default("monthly"),
   currency: z.string().trim().length(3).default("USD"),
   applicationDeadline: z.coerce.date().optional(),
   vacancies: z.number().int().min(1).max(10000).default(1),
@@ -146,6 +147,7 @@ export const applicantProfileSchema = z.object({
   preferredWorkModes: z.array(z.enum(WORK_MODES)).max(3).optional(),
   expectedSalaryMin: z.number().min(0).optional(),
   expectedSalaryMax: z.number().min(0).optional(),
+  expectedSalaryPeriod: z.enum(SALARY_PERIODS).optional(),
   currency: z.string().trim().length(3).optional(),
   isDiscoverable: z.boolean().optional(),
   emailJobRecommendations: z.boolean().optional(),

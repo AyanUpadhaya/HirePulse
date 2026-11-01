@@ -177,7 +177,7 @@ export const runRecommendationEmailDigest = async (now = new Date()) => {
       match: { role: ROLES.APPLICANT, status: "active" },
       select: "name email role status",
     })
-    .select("user skills experience preferredLocations preferredWorkModes expectedSalaryMin emailJobRecommendations");
+    .select("user skills experience preferredLocations preferredWorkModes expectedSalaryMin expectedSalaryMax expectedSalaryPeriod currency emailJobRecommendations");
   const digestDate = getLocalDate(now, env.appTimezone);
   let nextProfile = 0;
   let sent = 0;

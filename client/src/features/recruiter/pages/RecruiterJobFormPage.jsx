@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/features/auth/authSlice";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { jobSchema, employmentTypes, workModes, jobStatuses } from "@/features/jobs/schemas";
+import { jobSchema, employmentTypes, workModes, salaryPeriods, jobStatuses } from "@/features/jobs/schemas";
 import {
   useGetJobByIdQuery,
   useCreateJobMutation,
@@ -81,6 +81,7 @@ export function RecruiterJobFormPage() {
       minExperienceYears: 0,
       salaryMin: undefined,
       salaryMax: undefined,
+      salaryPeriod: "monthly",
       currency: "USD",
       applicationDeadline: "",
       vacancies: 1,
@@ -114,6 +115,7 @@ export function RecruiterJobFormPage() {
         minExperienceYears: job.minExperienceYears || 0,
         salaryMin: job.salaryMin != null ? job.salaryMin : undefined,
         salaryMax: job.salaryMax != null ? job.salaryMax : undefined,
+        salaryPeriod: job.salaryPeriod || "monthly",
         currency: job.currency || "USD",
         applicationDeadline: job.applicationDeadline
           ? job.applicationDeadline.slice(0, 10)
@@ -300,7 +302,7 @@ export function RecruiterJobFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="employmentType">
                   Employment Type
@@ -490,6 +492,19 @@ export function RecruiterJobFormPage() {
               </div>
 
               <div className="space-y-1.5">
+                <label className="text-sm font-medium" htmlFor="salaryPeriod">
+                  Salary Period
+                </label>
+                <Select id="salaryPeriod" {...register("salaryPeriod")}>
+                  {salaryPeriods.map((period) => (
+                    <option key={period.value} value={period.value}>
+                      {period.label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="currency">
                   Currency
                 </label>
@@ -558,4 +573,3 @@ export function RecruiterJobFormPage() {
     </div>
   );
 }
-

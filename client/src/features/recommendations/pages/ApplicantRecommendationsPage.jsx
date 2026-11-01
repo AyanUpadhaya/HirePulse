@@ -17,7 +17,7 @@ import {
   ArrowRight,
   TrendingUp,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatSalaryRange } from "@/lib/utils";
 
 export function ApplicantRecommendationsPage() {
   const { toast } = useToast();
@@ -164,11 +164,7 @@ export function ApplicantRecommendationsPage() {
                       {hasSalary && (
                         <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
                           <DollarSign className="w-3.5 h-3.5" />
-                          {job.salaryMin && job.salaryMax
-                            ? `${formatCurrency(job.salaryMin, job.currency)} - ${formatCurrency(job.salaryMax, job.currency)}`
-                            : job.salaryMin
-                            ? `From ${formatCurrency(job.salaryMin, job.currency)}`
-                            : `Up to ${formatCurrency(job.salaryMax, job.currency)}`}
+                          {formatSalaryRange(job)}
                         </span>
                       )}
                     </div>
@@ -210,4 +206,3 @@ export function ApplicantRecommendationsPage() {
     </div>
   );
 }
-

@@ -7,6 +7,7 @@ import { applicantProfileSchema } from "../schemas";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
@@ -28,7 +29,7 @@ import {
   Copy,
   Share2,
 } from "lucide-react";
-import { employmentTypes, workModes } from "@/features/jobs/schemas";
+import { employmentTypes, workModes, salaryPeriods } from "@/features/jobs/schemas";
 import { selectCurrentUser } from "@/features/auth/authSlice";
 
 export function ApplicantProfilePage() {
@@ -68,6 +69,7 @@ export function ApplicantProfilePage() {
       preferredWorkModes: [],
       expectedSalaryMin: 0,
       expectedSalaryMax: 0,
+      expectedSalaryPeriod: "monthly",
       currency: "USD",
       isDiscoverable: true,
       emailJobRecommendations: false,
@@ -144,6 +146,7 @@ export function ApplicantProfilePage() {
         preferredWorkModes: profile.preferredWorkModes || [],
         expectedSalaryMin: profile.expectedSalaryMin || 0,
         expectedSalaryMax: profile.expectedSalaryMax || 0,
+        expectedSalaryPeriod: profile.expectedSalaryPeriod || "monthly",
         currency: profile.currency || "USD",
         isDiscoverable: profile.isDiscoverable !== false,
         emailJobRecommendations: Boolean(profile.emailJobRecommendations),
@@ -919,7 +922,7 @@ export function ApplicantProfilePage() {
                 </div>
 
                 {/* Salary Expectations */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
                   <div className="space-y-1">
                     <label className="text-xs font-medium">Expected Min Salary</label>
                     <Input
@@ -927,6 +930,14 @@ export function ApplicantProfilePage() {
                       min={0}
                       {...register("expectedSalaryMin")}
                     />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium" htmlFor="expectedSalaryPeriod">Salary Period</label>
+                    <Select id="expectedSalaryPeriod" {...register("expectedSalaryPeriod")}>
+                      {salaryPeriods.map((period) => (
+                        <option key={period.value} value={period.value}>{period.label}</option>
+                      ))}
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-medium">Expected Max Salary</label>
