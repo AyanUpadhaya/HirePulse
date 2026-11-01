@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { KeyRound, UserRound, LogOut } from "lucide-react";
+import { KeyRound, UserRound, LogOut, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/components/ui/Toast";
 import { logout, selectCurrentUser } from "@/features/auth/authSlice";
-import { useChangePasswordMutation, useUpdateAccountMutation } from "@/features/auth/api";
+import {
+  useChangePasswordMutation,
+  useRemoveAvatarMutation,
+  useUpdateAccountMutation,
+  useUploadAvatarMutation,
+} from "@/features/auth/api";
 import { baseApi } from "@/lib/baseApi";
 
 export function SettingsPage() {
@@ -18,40 +23,88 @@ export function SettingsPage() {
   const { toast } = useToast();
   const [updateAccount, accountState] = useUpdateAccountMutation();
   const [changePassword, passwordState] = useChangePasswordMutation();
-  const [account, setAccount] = useState({ name: "", email: "", avatar: "", currentPassword: "" });
+  const [account, setAccount] = useState({ name: "" });
   const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [accountError, setAccountError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarError, setAvatarError] = useState("");
+  const avatarInputRef = useRef(null);
+  const [uploadAvatar, avatarUploadState] = useUploadAvatarMutation();
+  const [removeAvatar, avatarRemoveState] = useRemoveAvatarMutation();
 
   useEffect(() => {
     setAccount({
       name: user?.name || "",
-      email: user?.email || "",
-      avatar: user?.avatar || "",
-      currentPassword: "",
     });
   }, [user]);
+
+  useEffect(() => {
+    if (!avatarFile) {
+      setAvatarPreview("");
+      return undefined;
+    }
+    const previewUrl = URL.createObjectURL(avatarFile);
+    setAvatarPreview(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [avatarFile]);
 
   const onAccountSubmit = async (event) => {
     event.preventDefault();
     setAccountError("");
-    const email = account.email.trim().toLowerCase();
-    if (email !== user?.email && !account.currentPassword) {
-      setAccountError("Enter your current password to change your email address.");
-      return;
-    }
-
     try {
       await updateAccount({
         name: account.name.trim(),
-        email,
-        avatar: account.avatar.trim() || null,
-        ...(email !== user?.email ? { currentPassword: account.currentPassword } : {}),
       }).unwrap();
-      setAccount((previous) => ({ ...previous, currentPassword: "" }));
       toast({ title: "Account updated", description: "Your account details have been saved.", variant: "success" });
     } catch (error) {
       setAccountError(error.data?.message || "Could not update your account. Please try again.");
+    }
+  };
+
+  const onAvatarFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setAvatarError("");
+    if (file && !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setAvatarFile(null);
+      setAvatarError("Choose a JPEG, PNG, or WebP image.");
+      event.target.value = "";
+      return;
+    }
+    if (file && file.size > 5 * 1024 * 1024) {
+      setAvatarFile(null);
+      setAvatarError("Choose an image that is 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+    setAvatarFile(file);
+  };
+
+  const onAvatarUpload = async () => {
+    if (!avatarFile) return;
+    setAvatarError("");
+    const formData = new FormData();
+    formData.append("avatar", avatarFile);
+    try {
+      await uploadAvatar(formData).unwrap();
+      setAvatarFile(null);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+      toast({ title: "Profile photo updated", description: "Your new photo is now visible across HirePulse.", variant: "success" });
+    } catch (error) {
+      setAvatarError(error.data?.message || "Could not upload your photo. Please try again.");
+    }
+  };
+
+  const onAvatarRemove = async () => {
+    setAvatarError("");
+    try {
+      await removeAvatar().unwrap();
+      setAvatarFile(null);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+      toast({ title: "Profile photo removed", description: "Your profile no longer has a photo.", variant: "success" });
+    } catch (error) {
+      setAvatarError(error.data?.message || "Could not remove your photo. Please try again.");
     }
   };
 
@@ -102,7 +155,7 @@ export function SettingsPage() {
             <div className="rounded-lg bg-primary/10 p-2 text-primary"><UserRound className="h-5 w-5" /></div>
             <div>
               <CardTitle>Personal details</CardTitle>
-              <CardDescription>Update your name, email address, or profile photo.</CardDescription>
+              <CardDescription>Update your name and profile photo. Your email address cannot be changed.</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -116,20 +169,63 @@ export function SettingsPage() {
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="account-email" className="text-sm font-medium">Email address</label>
-                <Input id="account-email" type="email" autoComplete="email" required value={account.email} onChange={(event) => setAccount({ ...account, email: event.target.value })} />
+                <Input id="account-email" type="email" autoComplete="email" value={user?.email || ""} disabled />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label htmlFor="account-avatar" className="text-sm font-medium">Avatar image URL</label>
-              <Input id="account-avatar" type="url" placeholder="https://example.com/photo.jpg" value={account.avatar} onChange={(event) => setAccount({ ...account, avatar: event.target.value })} />
-              <p className="text-xs text-muted-foreground">Leave blank to remove your current avatar.</p>
-            </div>
-            {account.email.trim().toLowerCase() !== user?.email && (
-              <div className="space-y-1.5">
-                <label htmlFor="email-current-password" className="text-sm font-medium">Current password (required to change email)</label>
-                <PasswordInput id="email-current-password" autoComplete="current-password" value={account.currentPassword} onChange={(event) => setAccount({ ...account, currentPassword: event.target.value })} />
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Profile photo</p>
+              <div className="flex flex-wrap items-center gap-4">
+                {avatarPreview || user?.avatar ? (
+                  <img
+                    src={avatarPreview || user.avatar}
+                    alt="Profile photo preview"
+                    className="h-16 w-16 rounded-full border object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <UserRound className="h-7 w-7" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Input
+                    ref={avatarInputRef}
+                    id="account-avatar"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={onAvatarFileChange}
+                    disabled={avatarUploadState.isLoading || avatarRemoveState.isLoading}
+                    aria-describedby="account-avatar-help"
+                  />
+                  <p id="account-avatar-help" className="text-xs text-muted-foreground">
+                    JPEG, PNG, or WebP. Maximum file size: 5 MB.
+                    {avatarFile ? ` Selected: ${avatarFile.name}` : ""}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={onAvatarUpload}
+                    disabled={!avatarFile || avatarRemoveState.isLoading}
+                    isLoading={avatarUploadState.isLoading}
+                  >
+                    <Upload className="mr-2 h-4 w-4" /> Upload photo
+                  </Button>
+                  {user?.avatar && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onAvatarRemove}
+                      disabled={avatarUploadState.isLoading}
+                      isLoading={avatarRemoveState.isLoading}
+                      aria-label="Remove profile photo"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            )}
+              {avatarError && <p className="text-sm text-destructive" role="alert">{avatarError}</p>}
+            </div>
             {accountState.error?.data?.message && !accountError && (
               <p className="text-sm text-destructive" role="alert">{accountState.error.data.message}</p>
             )}

@@ -58,10 +58,10 @@ export const changePasswordSchema = z.object({
 
 export const accountUpdateSchema = z.object({
   name: z.string().trim().min(2).max(50).optional(),
-  email: z.string().trim().toLowerCase().email().optional(),
-  avatar: z.string().trim().max(2000).url().nullable().optional(),
-  currentPassword: z.string().min(1).optional(),
-}).refine((value) => Object.keys(value).some((key) => key !== "currentPassword"), {
+  email: z.never().optional(),
+  avatar: z.never().optional(),
+  currentPassword: z.never().optional(),
+}).refine((value) => Object.keys(value).some((key) => key === "name"), {
   message: "Provide at least one account update",
 });
 
@@ -102,8 +102,7 @@ export const applicationStatusSchema = z.object({
 export const userUpdateSchema = z.object({
   name: z.string().trim().min(2).max(50).optional(),
   email: z.string().trim().toLowerCase().email().optional(),
-  avatar: z.string().trim().max(2000).nullable().optional(),
-  currentPassword: z.string().min(1).optional(),
+  avatar: z.never().optional(),
   role: z.enum(Object.values(ROLES)).optional(),
   status: z.enum(["active", "suspended", "deleted"]).optional(),
 });

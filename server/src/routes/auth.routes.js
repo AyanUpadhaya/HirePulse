@@ -10,8 +10,10 @@ import {
   resetPassword,
   updateAccount,
 } from '../controllers/auth.controller.js';
+import { removeUserAvatar, uploadUserAvatar } from '../controllers/user.controller.js';
 import { protect } from '../middleware/auth.js';
-import { authLimiter, passwordResetLimiter, refreshLimiter } from '../middleware/rateLimiter.js';
+import { authLimiter, avatarUploadLimiter, passwordResetLimiter, refreshLimiter } from '../middleware/rateLimiter.js';
+import { uploadAvatarFile } from '../middleware/avatarUpload.js';
 import { validate } from '../middleware/validate.js';
 import {
   accountUpdateSchema,
@@ -31,6 +33,8 @@ router.post('/reset-password', passwordResetLimiter, validate(resetPasswordSchem
 router.post('/refresh', refreshLimiter, refresh);
 router.post('/logout', logout);
 router.get('/me', protect, me);
+router.post('/avatar', protect, avatarUploadLimiter, uploadAvatarFile, uploadUserAvatar);
+router.delete('/avatar', protect, removeUserAvatar);
 router.patch('/account', protect, validate(accountUpdateSchema), updateAccount);
 router.patch('/password', protect, validate(changePasswordSchema), changePassword);
 

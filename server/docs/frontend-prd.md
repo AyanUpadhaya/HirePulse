@@ -230,14 +230,16 @@ The `limit` is clamped server-side. Job listing defaults to 10 and maxes at 50; 
 | `POST /auth/refresh` | Refresh cookie | No JSON body; include credentials | `{ user, accessToken }`; rotates refresh cookie. |
 | `POST /auth/logout` | Refresh cookie if present | No JSON body; include credentials | `null`; revokes only the current refresh session and clears cookie. |
 | `GET /auth/me` | Authenticated (access token) | None | `{ user }` |
-| `PATCH /auth/account` | Authenticated | Any non-empty subset of `{ "name": "Jane Doe", "email": "jane@example.com", "avatar": "https://..." }`; changing email also requires `currentPassword` | Updated `{ user }`; duplicate emails are rejected. |
+| `PATCH /auth/account` | Authenticated | `{ "name": "Jane Doe" }` | Updated `{ user }`; email changes are rejected. |
+| `POST /auth/avatar` | Authenticated | `multipart/form-data` with an `avatar` JPEG, PNG, or WebP file (max 5 MB) | Updated `{ user }`; stores the profile photo in Cloudinary and returns the new user so the frontend can update auth state. |
+| `DELETE /auth/avatar` | Authenticated | None | Updated `{ user }` with `avatar: null`; removes the linked Cloudinary image when possible. |
 | `PATCH /auth/password` | Authenticated | `{ "currentPassword": "OldPassword123", "newPassword": "NewPassword123" }` | `null`; revokes all refresh sessions and clears the refresh cookie. |
 
 Password registration requirements: at least 8 characters, including one letter and one number. Email is normalized to lowercase. Admin accounts cannot self-register.
 
-Password reset email requires the existing SMTP environment variables and uses `FRONTEND_URL` to build the reset link. Reset tokens are stored hashed, expire after one hour, are rate limited, and can be consumed only once. The UI provides account settings for all authenticated roles; changing email requires the current password, and changing password ends other refresh sessions.
+Password reset email requires the existing SMTP environment variables and uses `FRONTEND_URL` to build the reset link. Reset tokens are stored hashed, expire after one hour, are rate limited, and can be consumed only once. The UI provides account settings for all authenticated roles; email is displayed as read-only, and changing password ends other refresh sessions. Admins can update a user's email through user management.
 
-User fields commonly returned: `_id`, `name`, `email`, `role`, `status`, `avatar`, `lastLoginAt`, `isProfileCompleted`, timestamps. Password and refresh token data are not returned.
+User fields commonly returned: `_id`, `name`, `email`, `role`, `status`, `avatar`, `lastLoginAt`, `isProfileCompleted`, timestamps. Password, refresh token data, and Cloudinary public IDs are not returned.
 
 ### Job categories — `/job-categories`
 
@@ -375,7 +377,9 @@ Applicant profile payload example:
 
 Expected salary periods are `monthly`, `yearly`, or `hourly` (default `monthly`). Recommendation matching annualizes salary ranges for comparison (`monthly × 12`, `yearly × 1`, `hourly × 2,080`); the hourly factor is an estimate. Salary is treated as neutral when either side has no salary range or their currencies differ.
 
-Resume values are Cloudinary secure URL strings, not `FileAsset` references. Upload a PDF with `FormData` to `POST /profiles/applicant/resume` using the field name `resume`; do not set the multipart `Content-Type` header manually because the browser must add its boundary. Uploads are limited to one PDF file up to 5 MB. The endpoint updates the applicant's profile and returns the URL; send that URL in the profile `resume` field when editing profile data or optionally in an application payload. Configure Cloudinary server-side using `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`, with optional `CLOUDINARY_RESUME_FOLDER`. Until those credentials are set, uploads return `503`.
+Resume values are Cloudinary secure URL strings, not `FileAsset` references. Upload a PDF with `FormData` to `POST /profiles/applicant/resume` using the field name `resume`; do not set the multipart `Content-Type` header manually because the browser must add its boundary. Uploads are limited to one PDF file up to 5 MB. The endpoint updates the applicant's profile and returns the URL; send that URL in the profile `resume` field when editing profile data or optionally in an application payload. Configure Cloudinary server-side using `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`, with optional `CLOUDINARY_RESUME_FOLDER` and `CLOUDINARY_AVATAR_FOLDER`. Until those credentials are set, uploads return `503`.
+
+For account photos, the settings page sends the selected image as `FormData` to `POST /auth/avatar` using the field name `avatar`; the browser must set the multipart boundary. The server accepts JPEG, PNG, or WebP images up to 5 MB, verifies the file signature, stores a resized image in the configured Cloudinary avatar folder, and persists the secure URL on the user. The response updates the frontend auth user immediately. `DELETE /auth/avatar` removes the photo. Avatar URLs must not be set through account or user update payloads.
 
 Applicants can turn on recruiter sharing in the General profile tab and copy a recruiter-only profile link at `/applicants/:userId`. Recruiters must sign in to view it; disabling `isDiscoverable` immediately makes the shared page unavailable. Admins and anonymous visitors cannot view this page.
 
@@ -452,7 +456,7 @@ Notification types include `application_submitted`, `application_status_changed`
 | Method and path | Access | Payload / query | Response data |
 |---|---|---|---|
 | `GET /users` | Admin | `?page=1&limit=20`; optional `role=applicant\|recruiter\|admin`, `status=active\|suspended\|deleted` | Paginated user list |
-| `PATCH /users/:id` | User self or admin | Any subset of `{ "name": "Jane Doe", "email": "jane@example.com", "avatar": "https://...", "role": "recruiter", "status": "active" }`; changing your own email requires `currentPassword` | Updated user |
+| `PATCH /users/:id` | User self or admin | Any subset of `{ "name": "Jane Doe", "email": "jane@example.com", "role": "recruiter", "status": "active" }`; only admins can change an email address | Updated user |
 | `DELETE /users/:id` | Self or admin | No body | `null`; deactivates/marks account deleted rather than physically removing it |
 
 Only admins can change `role` or `status`; users cannot change their own role or deactivate themselves through `PATCH`. The delete action for self marks the account deleted. Admins cannot change their own role through the update endpoint.

@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    avatarPublicId: { type: String, select: false },
     lastLoginAt: { type: Date, default: null },
     refreshTokens: { type: [refreshTokenSchema], default: [], select: false },
     isProfileCompleted: { type: Boolean, default: false },
@@ -68,6 +69,7 @@ userSchema.set("toJSON", {
     delete ret.refreshTokens;
     delete ret.passwordResetTokenHash;
     delete ret.passwordResetExpiresAt;
+    delete ret.avatarPublicId;
     delete ret.__v;
     return ret;
   },

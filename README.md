@@ -53,7 +53,7 @@ HirePulse is an AI-assisted recruitment marketplace MVP that helps applicants fi
 | Backend | Node.js (18+), Express 4, Mongoose 8, Zod |
 | Database | MongoDB |
 | Authentication | JWT access tokens and secure refresh-token cookies |
-| Optional integrations | OpenRouter for AI, Cloudinary for resume uploads, SMTP for recommendation emails |
+| Optional integrations | OpenRouter for AI, Cloudinary for resume and profile photo uploads, SMTP for recommendation emails |
 
 ## Run locally
 
@@ -90,11 +90,12 @@ REFRESH_TOKEN_DAYS=7
 # Comma-separated list of allowed frontend origins
 CLIENT_URL=http://localhost:5173
 
-# Cloudinary resume uploads
+# Cloudinary resume and profile photo uploads
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 CLOUDINARY_RESUME_FOLDER=
+CLOUDINARY_AVATAR_FOLDER=job-marketplace/avatars
 
 # SMTP email for scheduled job recommendation digests
 SMTP_HOST=
@@ -171,7 +172,7 @@ The seed script creates job categories, an admin, a recruiter, an applicant, and
 
 The app runs without these integrations, but their related features require configuration in `server/.env`:
 
-- **Resume uploads:** set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`.
+- **Resume and profile photo uploads:** set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`. The avatar folder defaults to `job-marketplace/avatars`; optionally set `CLOUDINARY_AVATAR_FOLDER`.
 - **AI job descriptions and match insights:** set `OPENROUTER_API_KEY`. Keep this secret on the server; do not add it to a `VITE_` variable.
 - **Recommendation emails:** set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, and `EMAIL_FROM`. Configure `FRONTEND_URL`, `RECOMMENDATION_EMAIL_CRON`, and `APP_TIMEZONE` as needed.
 

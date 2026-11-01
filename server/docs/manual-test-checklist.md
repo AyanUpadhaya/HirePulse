@@ -20,8 +20,12 @@ Use this checklist to verify the API manually in a local development environment
 - [*] Try a wrong password and malformed registration/login payloads; verify clear non-success responses.
 - [ ] Call `GET /api/auth/me` with and without a valid access token.
 - [*] Refresh a session and verify the refresh cookie rotates; log out and verify the session is revoked.
-- [*] Update account name and avatar in settings; verify the user menu reflects the changes.
-- [ ] Change the account email with the correct current password; verify duplicate emails and missing/incorrect passwords are rejected.
+- [ ] Update account name in settings; verify the user menu reflects the change.
+- [ ] Upload a valid JPEG, PNG, and WebP profile photo when Cloudinary is configured; verify the returned user and user menu show the new photo.
+- [ ] Try an unsupported, invalid-signature, and oversized profile photo; verify each upload is rejected and the existing photo remains unchanged.
+- [ ] Remove the profile photo and verify the user menu returns to its default avatar.
+- [ ] Verify the account email is disabled in settings and cannot be changed through `PATCH /auth/account` or a self-update to `PATCH /users/:id`.
+- [ ] Verify admins can still update another user's email through user management and duplicate emails are rejected.
 - [ ] Change password with the current password; verify all refresh sessions are revoked and the user is sent to sign in again.
 - [*] Request password reset for a registered and an unregistered email; verify the public confirmation is identical.
 - [*] With SMTP configured, use the emailed reset link before and after its expiry; verify the valid token works once and expired/reused tokens fail.
@@ -112,6 +116,7 @@ Use this checklist to verify the API manually in a local development environment
 - [ ] When SMTP is configured, verify an opted-in applicant can receive a recommendation digest and an opted-out applicant does not.
 - [ ] When SMTP is not configured, verify the API starts and the rest of the application remains usable.
 - [ ] When Cloudinary is not configured, verify resume uploads fail clearly without preventing other profile updates.
+- [ ] When Cloudinary is not configured, verify profile photo uploads fail clearly without preventing account name or email updates.
 - [ ] Confirm responses use the standard success/error envelope and do not expose passwords, refresh tokens, or provider secrets.
 - [ ] Repeat key flows after reseeding and confirm tests use the newly returned IDs rather than stale database IDs.
 

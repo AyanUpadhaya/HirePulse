@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 
 export const getCloudinary = () => {
   if (!env.isCloudinaryConfigured) {
-    throw new ApiError(503, "Resume uploads are not configured");
+    throw new ApiError(503, "Cloudinary uploads are not configured");
   }
   cloudinary.config({
     cloud_name: env.cloudinaryCloudName,

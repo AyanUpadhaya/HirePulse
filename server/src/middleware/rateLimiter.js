@@ -24,3 +24,5 @@ export const passwordResetLimiter = make(60, 5, 'Too many password reset attempt
 export const refreshLimiter = make(15, 60, 'Too many refresh attempts.');
 
 export const aiLimiter = make(15, 10, 'Too many AI requests, please try again in 15 minutes.');
+
+export const avatarUploadLimiter = make(15, 10, 'Too many profile photo uploads, please try again in 15 minutes.');

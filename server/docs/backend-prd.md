@@ -31,7 +31,8 @@ The backend owns all OpenRouter communication and credentials. Existing job crea
 
 ### 2.3 Account settings and password recovery
 
-- Authenticated users can update their name, email, and avatar. Changing email requires the current password and rejects duplicate addresses.
+- Authenticated users can update their name, but cannot change their email address. Admins may update another user's email through the admin user-management endpoint.
+- Authenticated users can upload a JPEG, PNG, or WebP profile photo (maximum 5 MB) to Cloudinary. The server validates the image signature, stores the secure URL and Cloudinary public ID, and updates the authenticated user's record. Users can also remove their profile photo.
 - Authenticated users can change their password by providing the current password; successful changes revoke refresh sessions.
 - Public forgot-password requests always return the same confirmation to avoid revealing whether an email is registered.
 - For a registered email, send a one-time reset link using configured SMTP. Store only a hash of the token, expire it after one hour, and rate-limit reset requests.

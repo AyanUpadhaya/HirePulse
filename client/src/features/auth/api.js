@@ -89,6 +89,39 @@ export const authApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Auth"],
     }),
+    uploadAvatar: builder.mutation({
+      query: (formData) => ({
+        url: "/auth/avatar",
+        method: "POST",
+        body: formData,
+      }),
+      transformResponse: (response) => response.data.user,
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch {
+          // The caller displays the mutation error.
+        }
+      },
+      invalidatesTags: ["Auth", "Profile"],
+    }),
+    removeAvatar: builder.mutation({
+      query: () => ({
+        url: "/auth/avatar",
+        method: "DELETE",
+      }),
+      transformResponse: (response) => response.data.user,
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch {
+          // The caller displays the mutation error.
+        }
+      },
+      invalidatesTags: ["Auth", "Profile"],
+    }),
     changePassword: builder.mutation({
       query: (passwords) => ({
         url: "/auth/password",
@@ -122,6 +155,8 @@ export const {
   useLogoutMutation,
   useGetMeQuery,
   useUpdateAccountMutation,
+  useUploadAvatarMutation,
+  useRemoveAvatarMutation,
   useChangePasswordMutation,
   useRequestPasswordResetMutation,
   useResetPasswordMutation,

@@ -20,6 +20,7 @@ export const env = {
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
   cloudinaryResumeFolder: process.env.CLOUDINARY_RESUME_FOLDER || 'job-marketplace/resumes',
+  cloudinaryAvatarFolder: process.env.CLOUDINARY_AVATAR_FOLDER || 'job-marketplace/avatars',
   smtpHost: process.env.SMTP_HOST,
   smtpPort: Number(process.env.SMTP_PORT) || 587,
   smtpSecure: process.env.SMTP_SECURE === 'true',

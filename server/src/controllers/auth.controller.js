@@ -61,20 +61,9 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const updateAccount = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('+password');
+  const user = await User.findById(req.user._id);
   if (!user) throw new ApiError(404, 'User not found');
-
-  if (req.body.email && req.body.email !== user.email) {
-    if (!req.body.currentPassword || !(await user.comparePassword(req.body.currentPassword))) {
-      throw new ApiError(401, 'Current password is required to change your email');
-    }
-    if (await User.exists({ email: req.body.email, _id: { $ne: user._id } })) {
-      throw new ApiError(409, 'Email already in use');
-    }
-    user.email = req.body.email;
-  }
   if (req.body.name !== undefined) user.name = req.body.name;
-  if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
   await user.save();
   res.json({ success: true, data: { user } });
 });
