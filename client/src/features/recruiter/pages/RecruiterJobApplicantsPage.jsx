@@ -20,8 +20,6 @@ import {
   ExternalLink,
   Calendar,
   CheckCircle,
-  Briefcase,
-  GraduationCap,
   Sparkles,
 } from "lucide-react";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -57,8 +55,7 @@ export function RecruiterJobApplicantsPage() {
   const [nextStatus, setNextStatus] = useState("");
   const [statusNote, setStatusNote] = useState("");
 
-  // Candidate inspect modal state
-  const [inspectTarget, setInspectTarget] = useState(null);
+  const [expandedCoverLetters, setExpandedCoverLetters] = useState({});
 
   const handleOpenStatusModal = (app) => {
     setStatusTarget(app);
@@ -99,7 +96,6 @@ export function RecruiterJobApplicantsPage() {
     try {
       const conv = await createConversation({
         recipient: recipientId,
-        job: jobId,
         application: app._id,
       }).unwrap();
       navigate(`/messages/${conv._id}`);
@@ -202,11 +198,33 @@ export function RecruiterJobApplicantsPage() {
                         {applicant.email && <span>✉️ {applicant.email}</span>}
                       </div>
 
-                      {/* Cover letter snippet */}
                       {app.coverLetter && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-2 bg-muted/40 p-2.5 rounded-lg border">
-                          <strong className="text-foreground">Cover letter:</strong> {app.coverLetter}
-                        </p>
+                        <div className="mt-2">
+                          <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="h-auto justify-start p-0 text-xs"
+                            aria-expanded={Boolean(expandedCoverLetters[app._id])}
+                            aria-controls={`cover-letter-${app._id}`}
+                            onClick={() =>
+                              setExpandedCoverLetters((current) => ({
+                                ...current,
+                                [app._id]: !current[app._id],
+                              }))
+                            }
+                          >
+                            {expandedCoverLetters[app._id] ? "Hide cover letter" : "Show cover letter"}
+                          </Button>
+                          {expandedCoverLetters[app._id] && (
+                            <p
+                              id={`cover-letter-${app._id}`}
+                              className="mt-2 whitespace-pre-wrap rounded-lg border bg-muted/40 p-2.5 text-xs text-muted-foreground"
+                            >
+                              {app.coverLetter}
+                            </p>
+                          )}
+                        </div>
                       )}
 
                       {/* Candidate Skills preview */}
@@ -239,15 +257,6 @@ export function RecruiterJobApplicantsPage() {
                         </Button>
                       </Link>
                     )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setInspectTarget({ applicant, profile, app })}
-                      className="text-xs"
-                    >
-                      Inspect Profile
-                    </Button>
-
                     {resumeUrl && (
                       <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
                         <Button variant="outline" size="sm" className="gap-1 text-xs">
@@ -347,92 +356,6 @@ export function RecruiterJobApplicantsPage() {
         </div>
       </Dialog>
 
-      {/* Candidate Profile Inspection Modal */}
-      <Dialog
-        open={Boolean(inspectTarget)}
-        onOpenChange={(open) => !open && setInspectTarget(null)}
-      >
-        <div className="relative max-h-[80vh] overflow-y-auto pr-1">
-          <DialogClose onClick={() => setInspectTarget(null)} />
-          <DialogHeader>
-            <DialogTitle>{inspectTarget?.applicant?.name || "Candidate Profile"}</DialogTitle>
-            <DialogDescription>
-              {inspectTarget?.profile?.headline || "No headline provided"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 py-2 text-xs">
-            {inspectTarget?.profile?.summary && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-1">Bio / Summary</h4>
-                <p className="text-muted-foreground whitespace-pre-line leading-relaxed bg-muted/30 p-3 rounded-lg border">
-                  {inspectTarget.profile.summary}
-                </p>
-              </div>
-            )}
-
-            {inspectTarget?.profile?.skills && inspectTarget.profile.skills.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-2">Technical Proficiencies</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {inspectTarget.profile.skills.map((s, idx) => (
-                    <Badge key={idx} variant="secondary">
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {inspectTarget?.profile?.experience && inspectTarget.profile.experience.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5" />
-                  Work Experience
-                </h4>
-                <div className="space-y-2">
-                  {inspectTarget.profile.experience.map((exp, idx) => (
-                    <div key={idx} className="p-3 rounded-lg border bg-muted/20">
-                      <div className="font-semibold text-foreground">{exp.title}</div>
-                      <div className="text-muted-foreground">{exp.company}</div>
-                      {exp.description && (
-                        <p className="mt-1 text-muted-foreground whitespace-pre-line">
-                          {exp.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {inspectTarget?.profile?.education && inspectTarget.profile.education.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5" />
-                  Education
-                </h4>
-                <div className="space-y-2">
-                  {inspectTarget.profile.education.map((edu, idx) => (
-                    <div key={idx} className="p-3 rounded-lg border bg-muted/20">
-                      <div className="font-semibold text-foreground">
-                        {edu.qualification} in {edu.fieldOfStudy}
-                      </div>
-                      <div className="text-muted-foreground">{edu.institution}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end pt-2 border-t">
-              <Button size="sm" onClick={() => setInspectTarget(null)}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Dialog>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { ArrowLeft, Briefcase, GraduationCap, MapPin, UserRound } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -7,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useGetApplicantProfileByIdQuery } from "../api";
 import { getInitials } from "@/lib/utils";
+import { selectCurrentUser } from "@/features/auth/authSlice";
 
 const formatDate = (date) => {
   if (!date) return "";
@@ -15,6 +17,9 @@ const formatDate = (date) => {
 
 export function RecruiterApplicantProfilePage() {
   const { applicantId } = useParams();
+  const currentUser = useSelector(selectCurrentUser);
+  const backTo = currentUser?.role === "applicant" ? "/applicant/dashboard" : "/recruiter/candidates";
+  const backLabel = currentUser?.role === "applicant" ? "Back to dashboard" : "Back to candidates";
   const { data: profile, isLoading, error, refetch } = useGetApplicantProfileByIdQuery(applicantId);
 
   if (isLoading) {
@@ -31,8 +36,8 @@ export function RecruiterApplicantProfilePage() {
     const unavailable = error?.status === 404;
     return (
       <div className="mx-auto max-w-3xl space-y-6">
-        <Link to="/recruiter/candidates" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back to candidates
+        <Link to={backTo} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> {backLabel}
         </Link>
         <Card>
           <CardContent className="py-12 text-center">
@@ -58,8 +63,8 @@ export function RecruiterApplicantProfilePage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link to="/recruiter/candidates" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> Back to candidates
+      <Link to={backTo} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="h-4 w-4" /> {backLabel}
       </Link>
 
       <Card>

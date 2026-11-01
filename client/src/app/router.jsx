@@ -102,9 +102,9 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Shareable applicant profiles are visible only to signed-in recruiters.
+  // Shareable applicant profiles are visible to signed-in recruiters and applicants.
   {
-    element: <ProtectedRoute allowedRoles={["recruiter"]} />,
+    element: <ProtectedRoute allowedRoles={["recruiter", "applicant"]} />,
     children: [
       {
         element: <RoleLayoutWrapper />,
