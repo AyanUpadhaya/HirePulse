@@ -214,11 +214,11 @@ export function PublicLayout() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-3 text-sm">Platform</h4>
+            <h4 className="font-semibold text-foreground mb-3 text-sm">Why HirePulse</h4>
             <ul className="space-y-2 text-xs">
-              <li><span className="text-muted-foreground">Express API + React Vite</span></li>
-              <li><span className="text-muted-foreground">Built with RTK Query & Tailwind</span></li>
-              <li><span className="text-muted-foreground">Privacy-focused AI integration</span></li>
+              <li><span className="text-muted-foreground">Personalized job recommendations</span></li>
+              <li><span className="text-muted-foreground">A simpler way to manage hiring</span></li>
+              <li><span className="text-muted-foreground">AI that supports human decisions</span></li>
             </ul>
           </div>
         </div>
@@ -231,4 +231,3 @@ export function PublicLayout() {
     </div>
   );
 }
-
